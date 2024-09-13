@@ -7,9 +7,10 @@
 APuckGameMode::APuckGameMode()
 {
 	// set default pawn class to our Blueprinted character
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/ThirdPerson/Blueprints/BP_ThirdPersonCharacter"));
-	if (PlayerPawnBPClass.Class != NULL)
-	{
-		DefaultPawnClass = PlayerPawnBPClass.Class;
-	}
+	// static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Script/Engine.Blueprint'/Game/Blueprints/BP_PuckSlayer.BP_PuckSlayer'"));
+	// if (PlayerPawnBPClass.Class != NULL)
+	// {
+	// 	UE_LOG(LogTemp, Warning, TEXT("APuckGameMode Class Initialized"));
+	// 	DefaultPawnClass = PlayerPawnBPClass.Class;
+	// }
 }

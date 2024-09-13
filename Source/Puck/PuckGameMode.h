@@ -14,6 +14,3 @@ class APuckGameMode : public AGameModeBase
 public:
 	APuckGameMode();
 };
-
-
-

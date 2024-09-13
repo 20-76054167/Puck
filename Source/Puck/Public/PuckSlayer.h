@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "InputActionValue.h"
+
 #include "PuckSlayer.generated.h"
 
 UCLASS()
@@ -26,4 +28,38 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+protected:
+	UPROPERTY(EditAnywhere, Category = "Mesh")
+	class UStaticMeshComponent* WeaponMesh;
+	
+	UPROPERTY(VisibleAnywhere, Category = "Camera")
+	class USpringArmComponent* SpringArmComp;
+
+	UPROPERTY(VisibleAnywhere, Category = "Camera")
+	class UCameraComponent* CameraComp;
+	
+	UPROPERTY(EditAnywhere, Category = "Input")
+	class UInputMappingContext* PlayerMappingContext;
+
+	UPROPERTY(EditAnywhere, Category = "Input")
+	class UInputAction* IA_Move;
+
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* IA_LookUp;
+
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* IA_Turn;
+	
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* IA_Jump;
+	
+	void Move(const FInputActionValue& Value);
+	void LookUp(const FInputActionValue& Value);
+	void Turn(const FInputActionValue& Value);
+	void _Jump(const FInputActionValue& Value);
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Camera Options")
+	bool IsInvertLookUp = false;
+private:
+	FVector MoveDirection;
 };
