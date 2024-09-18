@@ -7,6 +7,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Blueprint/UserWidget.h"
 
 // Sets default values
 ASwyPlayer::ASwyPlayer()
@@ -31,9 +32,17 @@ ASwyPlayer::ASwyPlayer()
 	cameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	cameraComp->SetupAttachment(SpringArmComp, USpringArmComponent::SocketName);
 	cameraComp->SetRelativeLocationAndRotation(FVector(45,0,22), FRotator(-10,0,0));
-	cameraComp->bUsePawnControlRotation = false;
+	cameraComp->bUsePawnControlRotation = true;
 
-	//bUseControllerRotationYaw = true;
+	bUseControllerRotationYaw = false;
+
+	shotgunComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("shotgunComp"));
+	shotgunComp->SetupAttachment(GetMesh());
+
+	rifleComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("rifleComp"));
+	rifleComp->SetupAttachment(GetMesh());
+	rifleComp->SetVisibility(false);
+	
 }
 
 // Called when the game starts or when spawned
@@ -51,7 +60,17 @@ void ASwyPlayer::BeginPlay()
 			SubSystem->AddMappingContext(PlayerMappingContext, 0);
 		}
 	}
-	//SetupTimeline();
+
+	if(IsValid(rifleAimUIFactory))
+	{
+		_rifleAimUI = CreateWidget(GetWorld(), rifleAimUIFactory);	
+	}
+	
+	if(IsValid(shotgunAimUIFactory))
+	{
+		_shotgunAimUI = CreateWidget(GetWorld(), shotgunAimUIFactory);	
+	}
+	
 }
 
 void ASwyPlayer::StartDashFunc(FVector value)
@@ -71,29 +90,10 @@ void ASwyPlayer::EndDashFunc()
 	GetCharacterMovement()->MaxAcceleration = initChrterAcc;
 }
 
-void ASwyPlayer::SetupTimeline()
-{
-	if (Curve)
-	{
-		DashStartCallback.BindUFunction(this, FName("StartDashFunc"));
-		DashEndCallback.BindUFunction(this, FName("EndDashFunc"));
-		
-		MovementTimeline.AddInterpFloat(Curve, DashStartCallback);
-		MovementTimeline.SetTimelineFinishedFunc(DashEndCallback);
-
-		float min = 0;
-		float max = 0.5;
-		Curve->GetTimeRange(min, max);
-		MovementTimeline.SetTimelineLength(max);
-	}
-}
-
 // Called every frame
 void ASwyPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	MovementTimeline.TickTimeline(DeltaTime);
 }
 
 // Called to bind functionality to input
@@ -111,6 +111,8 @@ void ASwyPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 		EnhancedInputComponent->BindAction(dashIA, ETriggerEvent::Started, this, &ASwyPlayer::DashFunc);
 		EnhancedInputComponent->BindAction(zoomIA, ETriggerEvent::Started, this, &ASwyPlayer::ZoomFunc);
 		EnhancedInputComponent->BindAction(zoomIA, ETriggerEvent::Completed, this, &ASwyPlayer::ZoomOutFunc);
+		EnhancedInputComponent->BindAction(shotgunIA, ETriggerEvent::Started, this, &ASwyPlayer::ChangeToShotgun);
+		EnhancedInputComponent->BindAction(rifleIA, ETriggerEvent::Started, this, &ASwyPlayer::ChangeToRifle);
 	}
 }
 
@@ -118,7 +120,7 @@ void ASwyPlayer::MoveFunc(const FInputActionValue& value)
 {
 	//입력 값을 FVector 형태로 가져옴
 	const FVector _CurrentValue = value.Get<FVector>();
-
+	
 	//컨트롤러 Valid Check
 	if(Controller)
 	{
@@ -155,7 +157,6 @@ void ASwyPlayer::FireFunc(const FInputActionValue& value)
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		if(AnimInstance)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Montage Play"));
 			AnimInstance->Montage_Play(FireMontage);
 		}
 	}
@@ -169,7 +170,6 @@ void ASwyPlayer::JumpFunc(const FInputActionValue& value)
 
 void ASwyPlayer::DashFunc(const FInputActionValue& value)
 {
-	//MovementTimeline.PlayFromStart();
 	FVector LaunchVelocity = GetActorForwardVector() * 1500;
 	if (!GetCharacterMovement()->IsFalling())
 	{
@@ -185,12 +185,52 @@ void ASwyPlayer::DashFunc(const FInputActionValue& value)
 
 void ASwyPlayer::ZoomFunc(const FInputActionValue& value)
 {
-	SpringArmComp->TargetArmLength = 150;
+	//SpringArmComp->TargetArmLength = 150;
+	if(IsValid(_rifleAimUI))
+	{
+		//_rifleAimUI->AddToViewport();
+	}
+
+	if(IsValid(_shotgunAimUI))
+	{
+		_shotgunAimUI->AddToViewport();
+	}
+
+	cameraComp->SetFieldOfView(zoomInFloat);
 }
 
 void ASwyPlayer::ZoomOutFunc(const FInputActionValue& value)
 {
-	SpringArmComp->TargetArmLength = 250;
+	//SpringArmComp->TargetArmLength = 250;
+	if(IsValid(_rifleAimUI))
+	{
+		//_rifleAimUI->RemoveFromParent();
+	}
+
+	if(IsValid(_shotgunAimUI))
+	{
+		_shotgunAimUI->RemoveFromParent();
+	}
+
+	cameraComp->SetFieldOfView(90.0f);
+}
+
+void ASwyPlayer::ChangeToShotgun(const FInputActionValue& value)
+{
+	if(IsValid(rifleComp) && IsValid(shotgunComp))
+	{
+		rifleComp->SetVisibility(false);
+		shotgunComp->SetVisibility(true);
+	}
+}
+
+void ASwyPlayer::ChangeToRifle(const FInputActionValue& value)
+{
+	if(IsValid(rifleComp) && IsValid(shotgunComp))
+	{
+		rifleComp->SetVisibility(true);
+		shotgunComp->SetVisibility(false);
+	}
 }
 
 void ASwyPlayer::Fire()

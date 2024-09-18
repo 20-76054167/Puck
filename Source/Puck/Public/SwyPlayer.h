@@ -28,6 +28,12 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Camera")
 	class UCameraComponent* cameraComp;
 
+	UPROPERTY(EditAnywhere, Category = "Gun")
+	class USkeletalMeshComponent* shotgunComp;
+
+	UPROPERTY(EditAnywhere, Category = "Gun")
+	class USkeletalMeshComponent* rifleComp;
+
 	UPROPERTY(VisibleAnywhere, Category = "MovementOption")
 	float initChrterWalkSpd = 0.0f;
 
@@ -58,13 +64,15 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* dashIA;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* shotgunIA;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* rifleIA;
+
 	UPROPERTY(EditAnywhere, Category="Fire")
 	class UAnimMontage* FireMontage; 
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Curve")
-	class UCurveFloat* Curve;
-
-	FTimeline MovementTimeline;
+	
 	FOnTimelineFloat DashStartCallback;
 	FOnTimelineEvent DashEndCallback;
 
@@ -76,6 +84,8 @@ protected:
 	void DashFunc(const FInputActionValue& value);
 	void ZoomFunc(const FInputActionValue& value);
 	void ZoomOutFunc(const FInputActionValue& value);
+	void ChangeToShotgun(const FInputActionValue& value);
+	void ChangeToRifle(const FInputActionValue& value);
 
 	void Fire();
 	
@@ -83,7 +93,17 @@ protected:
 	void StartDashFunc(FVector value);
 	UFUNCTION()
 	void EndDashFunc();
-	void SetupTimeline();
+
+	UPROPERTY(EditAnywhere, Category="Widget")
+	TSubclassOf<class UUserWidget> rifleAimUIFactory;
+	class UUserWidget* _rifleAimUI;
+
+	UPROPERTY(EditAnywhere, Category="Widget")
+	TSubclassOf<class UUserWidget> shotgunAimUIFactory;
+	class UUserWidget* _shotgunAimUI;
+	
+	UPROPERTY(EditAnywhere, Category="Widget")
+	float zoomInFloat = 50.0f;
 
 public:	
 	// Called every frame
