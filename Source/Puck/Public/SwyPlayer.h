@@ -7,6 +7,7 @@
 #include "InputActionValue.h"
 #include "Components/TimelineComponent.h"
 #include "Puck/PuckCharacter.h"
+#include "EWType.h"
 #include "SwyPlayer.generated.h"
 
 UCLASS()
@@ -104,6 +105,9 @@ protected:
 	
 	UPROPERTY(EditAnywhere, Category="Widget")
 	float zoomInFloat = 50.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="State")
+	EWType currentEWType;
 
 public:	
 	// Called every frame

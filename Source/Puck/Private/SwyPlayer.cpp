@@ -63,12 +63,22 @@ void ASwyPlayer::BeginPlay()
 
 	if(IsValid(rifleAimUIFactory))
 	{
-		_rifleAimUI = CreateWidget(GetWorld(), rifleAimUIFactory);	
+		if(_rifleAimUI == nullptr)
+		{
+			_rifleAimUI = CreateWidget(GetWorld(), rifleAimUIFactory);
+			_rifleAimUI->AddToViewport();
+			_rifleAimUI->SetVisibility(ESlateVisibility::Hidden);
+		}
 	}
 	
 	if(IsValid(shotgunAimUIFactory))
 	{
-		_shotgunAimUI = CreateWidget(GetWorld(), shotgunAimUIFactory);	
+		if(_shotgunAimUI == nullptr)
+		{
+			_shotgunAimUI = CreateWidget(GetWorld(), shotgunAimUIFactory);
+			_shotgunAimUI->AddToViewport();
+			_shotgunAimUI->SetVisibility(ESlateVisibility::Hidden);
+		}
 	}
 	
 }
@@ -188,15 +198,18 @@ void ASwyPlayer::ZoomFunc(const FInputActionValue& value)
 	//SpringArmComp->TargetArmLength = 150;
 	if(IsValid(_rifleAimUI))
 	{
-		//_rifleAimUI->AddToViewport();
+		////_rifleAimUI->AddToViewport();
+		//_rifleAimUI->SetVisibility(ESlateVisibility::Visible);
+		//cameraComp->SetFieldOfView(zoomInFloat);
 	}
 
 	if(IsValid(_shotgunAimUI))
 	{
-		_shotgunAimUI->AddToViewport();
+		//_shotgunAimUI->AddToViewport();
+		_shotgunAimUI->SetVisibility(ESlateVisibility::Visible);
+		cameraComp->SetFieldOfView(zoomInFloat);
 	}
-
-	cameraComp->SetFieldOfView(zoomInFloat);
+	
 }
 
 void ASwyPlayer::ZoomOutFunc(const FInputActionValue& value)
@@ -204,15 +217,17 @@ void ASwyPlayer::ZoomOutFunc(const FInputActionValue& value)
 	//SpringArmComp->TargetArmLength = 250;
 	if(IsValid(_rifleAimUI))
 	{
-		//_rifleAimUI->RemoveFromParent();
+		////_rifleAimUI->RemoveFromParent();
+		//_rifleAimUI->SetVisibility(ESlateVisibility::Hidden);
+		//cameraComp->SetFieldOfView(90.0f);
 	}
 
 	if(IsValid(_shotgunAimUI))
 	{
-		_shotgunAimUI->RemoveFromParent();
+		_shotgunAimUI->SetVisibility(ESlateVisibility::Hidden);
+		cameraComp->SetFieldOfView(90.0f);
 	}
-
-	cameraComp->SetFieldOfView(90.0f);
+	
 }
 
 void ASwyPlayer::ChangeToShotgun(const FInputActionValue& value)
