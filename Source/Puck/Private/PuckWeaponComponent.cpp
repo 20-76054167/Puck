@@ -95,7 +95,7 @@ void UPuckWeaponComponent::Fire()
 			if (Projectile)
 			{
 				Projectile->SetDamage(BFG_Damage);
-				Projectile->ProjectileMovement->bRotationFollowsVelocity = true;
+		//		Projectile->ProjectileMovement->bRotationFollowsVelocity = true;
 				Projectile->SetActorRotation(SpawnRotation);
 			}
 		}

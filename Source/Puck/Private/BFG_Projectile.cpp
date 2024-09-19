@@ -5,6 +5,9 @@
 #include "PuckSlayer.h"
 #include "PuckWeaponComponent.h"
 
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
@@ -21,22 +24,24 @@ ABFG_Projectile::ABFG_Projectile()
 	CollisionComp->InitSphereRadius(5.0f);
 	CollisionComp->BodyInstance.SetCollisionProfileName("Projectile");
 	CollisionComp->OnComponentHit.AddDynamic(this, &ABFG_Projectile::OnHit);		// set up a notification for when this component hits something blocking
-
+	// Set as root component
+	RootComponent = CollisionComp;
+	
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	MeshComp->SetupAttachment(CollisionComp);
+
+	BulletNiagaraComp= CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraComponent"));
+	BulletNiagaraComp->SetupAttachment(CollisionComp);
 	
 	// Players can't walk on it
 	CollisionComp->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
 	CollisionComp->CanCharacterStepUpOn = ECB_No;
-
-	// Set as root component
-	RootComponent = CollisionComp;
-
-	// Use a ProjectileMovementComponent to govern this projectile's movement
+	
+	//Use a ProjectileMovementComponent to govern this projectile's movement
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
-	ProjectileMovement->UpdatedComponent = CollisionComp;
-	ProjectileMovement->InitialSpeed = 3000.f;
-	ProjectileMovement->MaxSpeed = 3000.f;
+	ProjectileMovement->UpdatedComponent = RootComponent;
+	ProjectileMovement->InitialSpeed = 1000.f;
+	ProjectileMovement->MaxSpeed = 1000.f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = true;
 
@@ -49,6 +54,28 @@ void ABFG_Projectile::BeginPlay()
 {
 	Super::BeginPlay();
 	CalculateVelocity();
+	if (BulletNiagaraEffect)
+	{
+		BulletNiagaraComp->SetAsset(BulletNiagaraEffect);
+		BulletNiagaraComp->Activate(true);
+	}
+}
+// 특정 위치에 Niagara 이펙트를 스폰하는 함수
+void ABFG_Projectile::SpawnNiagaraEffectAtLocation(UObject* WorldContextObject, UNiagaraSystem* NiagaraSystem, FVector Location, FRotator Rotation, FVector Scale)
+{
+	if (NiagaraSystem)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+			WorldContextObject,  // 월드 컨텍스트 오브젝트
+			NiagaraSystem,       // 스폰할 Niagara 시스템
+			Location,            // 스폰 위치
+			Rotation,            // 스폰 회전
+			Scale,               // 스케일
+			true,                // 자동으로 소멸할지 여부
+			true,                // AttachToComponent를 사용할지 여부
+			ENCPoolMethod::AutoRelease  // 풀링 방법
+		);
+	}
 }
 
 void ABFG_Projectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
@@ -56,11 +83,12 @@ void ABFG_Projectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UP
 {
 	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr) && OtherComp->IsSimulatingPhysics())
 	{
-		FVector CurrentVelocity = GetVelocity();
-		FVector Impulse = CurrentVelocity * ImpulseMultiplier;
+		FVector SpawnLocation = Hit.ImpactPoint;  // 이펙트를 스폰할 위치
+		FRotator SpawnRotation = FRotator::ZeroRotator;  // 기본 회전
+		FVector SpawnScale = FVector(1.0f);  // 기본 스케일
 
-		//Impulse.Z = FMath::Clamp(Impulse.Z, -1000000.0f, 0.0f);
-		OtherComp->AddImpulseAtLocation(Impulse, GetActorLocation());
+		// Niagara 이펙트 시스템을 특정 위치에 스폰
+		SpawnNiagaraEffectAtLocation(GetWorld(), HitNiagaraEffect, SpawnLocation, SpawnRotation, SpawnScale);
 		Destroy();
 	}
 }
@@ -69,30 +97,24 @@ void ABFG_Projectile::SetDamage(float DamageAmount)
 {
 	Damage = DamageAmount;
 	CalculateVelocity();
-	UE_LOG(LogTemp, Warning, TEXT("Damage : %f"), Damage);
 }
 
 void ABFG_Projectile::CalculateVelocity()
 {
 	FVector ForwardVector = GetActorForwardVector();
-	float CalculatedSpeed = Damage * 100 + 300;
+	float CalculatedSpeed = Damage * 100;
 	if(CalculatedSpeed < 0.0f)
 	{
 		CalculatedSpeed = 0.0f;
 	}
+	
 	FVector Velocity = ForwardVector * CalculatedSpeed;
-	//ProjectileMovement->SetVelocityInLocalSpace(Velocity);
-
+	ProjectileMovement->SetVelocityInLocalSpace(Velocity);
 	ProjectileMovement->Velocity = Velocity;
-	ProjectileMovement->InitialSpeed = CalculatedSpeed;
-	ProjectileMovement->MaxSpeed = CalculatedSpeed;
-
-	UE_LOG(LogTemp, Warning, TEXT("CalculatedSpeed: %f, Velocity: %s"), CalculatedSpeed, *Velocity.ToString());
 }
 
 // Called every frame
 void ABFG_Projectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }

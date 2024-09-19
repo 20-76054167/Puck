@@ -35,6 +35,18 @@ public:
 	/** Projectile movement component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	UProjectileMovementComponent* ProjectileMovement;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Effects")
+	class UNiagaraComponent* BulletNiagaraComp;
+
+	// Niagara System을 로드하기 위한 변수
+	UPROPERTY(EditAnywhere, Category = "Effects")
+	class UNiagaraSystem* BulletNiagaraEffect;
+
+	UPROPERTY(EditAnywhere, Category = "Effects")
+	UNiagaraSystem* HitNiagaraEffect;
+
+	void SpawnNiagaraEffectAtLocation(UObject* WorldContextObject, UNiagaraSystem* NiagaraSystem, FVector Location, FRotator Rotation, FVector Scale);
 	
 	/** called when projectile hits something */
 	UFUNCTION()
