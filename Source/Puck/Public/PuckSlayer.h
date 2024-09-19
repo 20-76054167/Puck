@@ -5,9 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
-
+#include "EWType.h"
 #include "PuckSlayer.generated.h"
 
+class UInputMappingContext;
+class UInputAction;
 UCLASS()
 class PUCK_API APuckSlayer : public ACharacter
 {
@@ -28,38 +30,75 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-protected:
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
-	class USpringArmComponent* SpringArmComp;
+	class USpringArmComponent* springArmComp;
 
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
-	class UCameraComponent* CameraComp;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
-	class UPuckWeaponComponent* WeaponComponent;
-	
-	UPROPERTY(EditAnywhere, Category = "Input")
-	class UInputMappingContext* PlayerMappingContext;
+	class UCameraComponent* cameraComp;
 
 	UPROPERTY(EditAnywhere, Category = "Input")
-	class UInputAction* IA_Move;
+	UInputMappingContext* PlayerMappingContext;
 
-	UPROPERTY(EditAnywhere, Category = "Input")
-	UInputAction* IA_LookUp;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* MoveIA;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* LookUpIA;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* TurnIA;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* JumpIA;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* FireIA;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* ZoomIA;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* DashIA;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* ShotgunIA;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* RifleIA;
 
-	UPROPERTY(EditAnywhere, Category = "Input")
-	UInputAction* IA_Turn;
-	
-	UPROPERTY(EditAnywhere, Category = "Input")
-	UInputAction* IA_Jump;
-	
+
+	UPROPERTY(EditAnywhere, Category = "Fire")
+	TSubclassOf<class APBullet> magazine;
+
 	void Move(const FInputActionValue& Value);
 	void LookUp(const FInputActionValue& Value);
 	void Turn(const FInputActionValue& Value);
-	void _Jump(const FInputActionValue& Value);
+	void InputJump(const FInputActionValue& Value);
+	void InputFire(const FInputActionValue& Value);
+	void DashFunc(const FInputActionValue& value);
+	void ZoomFunc(const FInputActionValue& value);
+	void ZoomOutFunc(const FInputActionValue& value);
+	void ChangeToShotgun(const FInputActionValue& value);
+	void ChangeToRifle(const FInputActionValue& value);
+	
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Camera Options")
-	bool IsInvertLookUp = false;
-private:
 	FVector MoveDirection;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Control option")
+	bool isInvertLookUp = false;
+
+
+	UPROPERTY(VisibleAnywhere, Category="EquipItem")
+	class UStaticMeshComponent* WeaponMeshComp;
+
+	UPROPERTY(EditAnywhere)
+	class APLauncher* PLauncher;
+
+	UPROPERTY(EditAnywhere, Category="Widget")
+	TSubclassOf<class UUserWidget> rifleAimUIFactory;
+	class UUserWidget* _rifleAimUI;
+
+	UPROPERTY(EditAnywhere, Category="Widget")
+	TSubclassOf<class UUserWidget> shotgunAimUIFactory;
+	class UUserWidget* _shotgunAimUI;
+	
+	UPROPERTY(EditAnywhere, Category="Widget")
+	float zoomInFloat = 50.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="State")
+	EWType currentEWType;
+
+	FTimerHandle dashTimer;
 };
