@@ -3,6 +3,7 @@
 
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "PuckWeaponComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -28,9 +29,9 @@ APuckSlayer::APuckSlayer()
 	CameraComp->SetupAttachment(SpringArmComp);
 	CameraComp->bUsePawnControlRotation = false;
 
-	// WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Weapon Mesh"));
-	// WeaponMesh->SetupAttachment(GetMesh(), FName(TEXT("Character1_RightHandSocket")));
-	
+	WeaponComponent = CreateDefaultSubobject<UPuckWeaponComponent>(TEXT("Weapon Component"));
+	//WeaponComponent->SetupAttachment(GetMesh(), FName(TEXT("WeaponSocket")));
+
 	bUseControllerRotationYaw = true;
 }
 
@@ -69,6 +70,7 @@ void APuckSlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 void APuckSlayer::Move(const FInputActionValue& Value)
 {
+	
 	const FVector _CurrentValue = Value.Get<FVector>();
 	if(Controller)
 	{

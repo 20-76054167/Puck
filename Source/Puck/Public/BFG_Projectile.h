@@ -7,6 +7,7 @@
 #include "BFG_Projectile.generated.h"
 
 class USphereComponent;
+class UStaticMeshComponent;
 class UProjectileMovementComponent;
 
 UCLASS()
@@ -27,6 +28,9 @@ protected:
 public:	
 	UPROPERTY(VisibleDefaultsOnly, Category=Projectile)
 	USphereComponent* CollisionComp;
+
+	UPROPERTY(VisibleDefaultsOnly, Category=Projectile)
+	UStaticMeshComponent* MeshComp;
 
 	/** Projectile movement component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))

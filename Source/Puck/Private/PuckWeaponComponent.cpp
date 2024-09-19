@@ -15,31 +15,28 @@ UPuckWeaponComponent::UPuckWeaponComponent()
 	// Default offset from the character location for projectiles to spawn
 	MuzzleOffset = FVector(100.0f, 0.0f, 10.0f);
 	PrimaryComponentTick.bCanEverTick = true;
-	static ConstructorHelpers::FClassFinder<ABFG_Projectile>ProjectileBPClass(TEXT("/Game/Blueprints/BP_BFG_Projectile.BP_BFG_Projectile"));
-	BFG_ProjectileClass = ProjectileBPClass.Class;
-
 	BFG_Damage = 100.f;
 }
 
 bool UPuckWeaponComponent::AttachWeapon(class APuckSlayer* TargetCharacter)
 {
 	Character = TargetCharacter;
-
 	// Check that the character is valid, and has no weapon component yet
-	if (Character == nullptr || Character->GetInstanceComponents().FindItemByClass<UPuckWeaponComponent>())
-	{
-		return false;
-	}
+	// if (Character == nullptr || Character->GetInstanceComponents().FindItemByClass<UPuckWeaponComponent>())
+	// {
+	// 	return false;
+	// }
 
 	// Attach the weapon to the First Person Character
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-	AttachToComponent(Character->GetMesh(), AttachmentRules, FName(TEXT("TempFireLoc")));
-
+	AttachToComponent(Character->GetMesh(), AttachmentRules, FName(TEXT("WeaponSocket")));
+	
 	// add the weapon as an instance component to the character
 	Character->AddInstanceComponent(this);
 	
 	if (APlayerController* PlayerController = Cast<APlayerController>(Character->GetController()))
 	{
+		
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
 			// Set the priority of the mapping to 1, so that it overrides the Jump action with the Fire action when using touch input
@@ -56,6 +53,7 @@ bool UPuckWeaponComponent::AttachWeapon(class APuckSlayer* TargetCharacter)
 
 void UPuckWeaponComponent::Fire()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Fire"));
 	if (Character == nullptr || Character->GetController() == nullptr)
 	{
 		return;
