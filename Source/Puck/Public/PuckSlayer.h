@@ -74,8 +74,6 @@ public:
 	UPROPERTY(EditAnywhere)
 	class APLauncher* PLauncher;
 
-	UPROPERTY(VisibleAnywhere)
-	class UStaticMeshComponent* LauncherWeapon;
 
 
 };

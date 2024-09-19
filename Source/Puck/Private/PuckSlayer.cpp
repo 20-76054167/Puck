@@ -42,22 +42,8 @@ APuckSlayer::APuckSlayer()
 
 	bUseControllerRotationYaw = true;
 
-	//WeaponMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponMesh"));
-	//WeaponMeshComp->SetupAttachment(GetMesh());
-
-	FName WeaponSocket(TEXT("hand_rSocket"));
-	if (GetMesh()->DoesSocketExist(WeaponSocket))
-	{
-		LauncherWeapon = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WEAPON"));
-
-		static ConstructorHelpers::FObjectFinder<UStaticMesh> SW(TEXT("/Script/Engine.StaticMesh'/Game/Blueprints/HugeWeapon.HugeWeapon'"));
-		if (SW.Succeeded())
-		{
-			LauncherWeapon->SetStaticMesh(SW.Object);
-		}
-		LauncherWeapon->SetupAttachment(GetMesh(), WeaponSocket);
-
-	}
+	WeaponMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponMesh"));
+	WeaponMeshComp->SetupAttachment(GetMesh());
 //	PLauncher = GetWorld()->SpawnActor<APLauncher>(APLauncher::StaticClass());
 	//PLauncher->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("hand_r"));
 
