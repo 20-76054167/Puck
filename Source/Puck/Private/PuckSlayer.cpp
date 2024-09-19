@@ -7,10 +7,9 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "PLauncher.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Blueprint/UserWidget.h"
 #include "PBullet.h"
-
-
-
 
 // Sets default values
 APuckSlayer::APuckSlayer()
@@ -32,7 +31,7 @@ APuckSlayer::APuckSlayer()
 	springArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	springArmComp->SetupAttachment(RootComponent);
 	springArmComp->SetRelativeLocationAndRotation(FVector(0, 0, 50), FRotator(-20, 0, 0));
-	springArmComp->TargetArmLength = 200;
+	springArmComp->TargetArmLength = 250;
 	springArmComp->bUsePawnControlRotation = true;
 
 
@@ -44,10 +43,7 @@ APuckSlayer::APuckSlayer()
 
 	WeaponMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponMesh"));
 	WeaponMeshComp->SetupAttachment(GetMesh());
-//	PLauncher = GetWorld()->SpawnActor<APLauncher>(APLauncher::StaticClass());
-	//PLauncher->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("hand_r"));
-
-
+	
 }
 
 // Called when the game starts or when spawned
@@ -61,6 +57,26 @@ void APuckSlayer::BeginPlay()
 			ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
 			Subsystem->AddMappingContext(PlayerMappingContext, 0);
+		}
+	}
+
+	if(IsValid(rifleAimUIFactory))
+	{
+		if(_rifleAimUI == nullptr)
+		{
+			_rifleAimUI = CreateWidget(GetWorld(), rifleAimUIFactory);
+			_rifleAimUI->AddToViewport();
+			_rifleAimUI->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}
+
+	if(IsValid(shotgunAimUIFactory))
+	{
+		if(_shotgunAimUI == nullptr)
+		{
+			_shotgunAimUI = CreateWidget(GetWorld(), shotgunAimUIFactory);
+			_shotgunAimUI->AddToViewport();
+			_shotgunAimUI->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
 	
@@ -85,6 +101,12 @@ void APuckSlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 		EnhancedInputComponent->BindAction(TurnIA, ETriggerEvent::Triggered, this, &APuckSlayer::Turn);
 		EnhancedInputComponent->BindAction(JumpIA, ETriggerEvent::Triggered, this, &APuckSlayer::InputJump);
 		EnhancedInputComponent->BindAction(FireIA, ETriggerEvent::Started, this, &APuckSlayer::InputFire);
+
+		EnhancedInputComponent->BindAction(DashIA, ETriggerEvent::Started, this, &APuckSlayer::DashFunc);
+		EnhancedInputComponent->BindAction(ZoomIA, ETriggerEvent::Started, this, &APuckSlayer::ZoomFunc);
+		EnhancedInputComponent->BindAction(ZoomIA, ETriggerEvent::Completed, this, &APuckSlayer::ZoomOutFunc);
+		EnhancedInputComponent->BindAction(ShotgunIA, ETriggerEvent::Started, this, &APuckSlayer::ChangeToShotgun);
+		EnhancedInputComponent->BindAction(RifleIA, ETriggerEvent::Started, this, &APuckSlayer::ChangeToRifle);
 	}
 
 }
@@ -134,4 +156,62 @@ void APuckSlayer::InputFire(const FInputActionValue& Value)
 {
 	FTransform firePosition = WeaponMeshComp->GetSocketTransform(TEXT("FirePosition"));
 	GetWorld()->SpawnActor<APBullet>(magazine, firePosition);
+}
+
+void APuckSlayer::DashFunc(const FInputActionValue& value)
+{
+	FVector LaunchVelocity = GetActorForwardVector() * 1500;
+	if (!GetCharacterMovement()->IsFalling())
+	{
+		GetCharacterMovement()->BrakingFrictionFactor = 0.0f; // 지면 마찰 감소
+	}
+	LaunchCharacter(LaunchVelocity, true, true);
+	
+	GetWorldTimerManager().SetTimer(dashTimer, FTimerDelegate::CreateLambda([this]()->void
+	{
+		GetCharacterMovement()->BrakingFrictionFactor = 2.0f;
+	}), 0.5f, false);
+}
+
+void APuckSlayer::ZoomFunc(const FInputActionValue& value)
+{
+	//SpringArmComp->TargetArmLength = 150;
+	if(IsValid(_rifleAimUI))
+	{
+		////_rifleAimUI->AddToViewport();
+		//_rifleAimUI->SetVisibility(ESlateVisibility::Visible);
+		//cameraComp->SetFieldOfView(zoomInFloat);
+	}
+
+	if(IsValid(_shotgunAimUI))
+	{
+		//_shotgunAimUI->AddToViewport();
+		_shotgunAimUI->SetVisibility(ESlateVisibility::Visible);
+		cameraComp->SetFieldOfView(zoomInFloat);
+	}
+}
+
+void APuckSlayer::ZoomOutFunc(const FInputActionValue& value)
+{
+	//SpringArmComp->TargetArmLength = 250;
+	if(IsValid(_rifleAimUI))
+	{
+		////_rifleAimUI->RemoveFromParent();
+		//_rifleAimUI->SetVisibility(ESlateVisibility::Hidden);
+		//cameraComp->SetFieldOfView(90.0f);
+	}
+
+	if(IsValid(_shotgunAimUI))
+	{
+		_shotgunAimUI->SetVisibility(ESlateVisibility::Hidden);
+		cameraComp->SetFieldOfView(90.0f);
+	}
+}
+
+void APuckSlayer::ChangeToShotgun(const FInputActionValue& value)
+{
+}
+
+void APuckSlayer::ChangeToRifle(const FInputActionValue& value)
+{
 }

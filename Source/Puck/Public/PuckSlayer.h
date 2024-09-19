@@ -5,8 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "EWType.h"
 #include "PuckSlayer.generated.h"
-
 
 class UInputMappingContext;
 class UInputAction;
@@ -49,6 +49,14 @@ public:
 	UInputAction* JumpIA;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* FireIA;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* ZoomIA;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* DashIA;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* ShotgunIA;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* RifleIA;
 
 
 	UPROPERTY(EditAnywhere, Category = "Fire")
@@ -59,7 +67,11 @@ public:
 	void Turn(const FInputActionValue& Value);
 	void InputJump(const FInputActionValue& Value);
 	void InputFire(const FInputActionValue& Value);
-
+	void DashFunc(const FInputActionValue& value);
+	void ZoomFunc(const FInputActionValue& value);
+	void ZoomOutFunc(const FInputActionValue& value);
+	void ChangeToShotgun(const FInputActionValue& value);
+	void ChangeToRifle(const FInputActionValue& value);
 	
 
 	FVector MoveDirection;
@@ -74,6 +86,19 @@ public:
 	UPROPERTY(EditAnywhere)
 	class APLauncher* PLauncher;
 
+	UPROPERTY(EditAnywhere, Category="Widget")
+	TSubclassOf<class UUserWidget> rifleAimUIFactory;
+	class UUserWidget* _rifleAimUI;
 
+	UPROPERTY(EditAnywhere, Category="Widget")
+	TSubclassOf<class UUserWidget> shotgunAimUIFactory;
+	class UUserWidget* _shotgunAimUI;
+	
+	UPROPERTY(EditAnywhere, Category="Widget")
+	float zoomInFloat = 50.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="State")
+	EWType currentEWType;
+
+	FTimerHandle dashTimer;
 };
