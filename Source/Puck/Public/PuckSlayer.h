@@ -101,4 +101,6 @@ public:
 	EWType currentEWType;
 
 	FTimerHandle dashTimer;
+	
+	void SetWidgetVisible(bool bVisible, EWType weaponType);
 };

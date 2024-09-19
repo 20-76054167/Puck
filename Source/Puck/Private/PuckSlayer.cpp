@@ -174,43 +174,57 @@ void APuckSlayer::DashFunc(const FInputActionValue& value)
 
 void APuckSlayer::ZoomFunc(const FInputActionValue& value)
 {
-	//SpringArmComp->TargetArmLength = 150;
-	if(IsValid(_rifleAimUI))
-	{
-		////_rifleAimUI->AddToViewport();
-		//_rifleAimUI->SetVisibility(ESlateVisibility::Visible);
-		//cameraComp->SetFieldOfView(zoomInFloat);
-	}
-
-	if(IsValid(_shotgunAimUI))
-	{
-		//_shotgunAimUI->AddToViewport();
-		_shotgunAimUI->SetVisibility(ESlateVisibility::Visible);
-		cameraComp->SetFieldOfView(zoomInFloat);
-	}
+	this->SetWidgetVisible(true, currentEWType);
 }
 
 void APuckSlayer::ZoomOutFunc(const FInputActionValue& value)
 {
-	//SpringArmComp->TargetArmLength = 250;
-	if(IsValid(_rifleAimUI))
-	{
-		////_rifleAimUI->RemoveFromParent();
-		//_rifleAimUI->SetVisibility(ESlateVisibility::Hidden);
-		//cameraComp->SetFieldOfView(90.0f);
-	}
-
-	if(IsValid(_shotgunAimUI))
-	{
-		_shotgunAimUI->SetVisibility(ESlateVisibility::Hidden);
-		cameraComp->SetFieldOfView(90.0f);
-	}
+	this->SetWidgetVisible(false, currentEWType);
 }
 
 void APuckSlayer::ChangeToShotgun(const FInputActionValue& value)
 {
+	currentEWType = EWType::Shotgun;
+	this->SetWidgetVisible(false, currentEWType);
 }
 
 void APuckSlayer::ChangeToRifle(const FInputActionValue& value)
 {
+	currentEWType = EWType::Rifle;
+	this->SetWidgetVisible(false, currentEWType);
+}
+
+void APuckSlayer::SetWidgetVisible(bool bVisible,  EWType weaponType)
+{
+	switch (weaponType)
+	{
+	case EWType::Shotgun :
+		if(bVisible)
+		{
+			_rifleAimUI->SetVisibility(ESlateVisibility::Hidden);
+			_shotgunAimUI->SetVisibility(ESlateVisibility::Visible);
+			cameraComp->SetFieldOfView(zoomInFloat);
+		}
+		else
+		{
+			_rifleAimUI->SetVisibility(ESlateVisibility::Hidden);
+			_shotgunAimUI->SetVisibility(ESlateVisibility::Hidden);
+			cameraComp->SetFieldOfView(90.0f);
+		}
+		break;
+	case EWType::Rifle :
+		if(bVisible)
+		{
+			_rifleAimUI->SetVisibility(ESlateVisibility::Visible);
+			_shotgunAimUI->SetVisibility(ESlateVisibility::Hidden);
+			cameraComp->SetFieldOfView(zoomInFloat);
+		}
+		else
+		{
+			_rifleAimUI->SetVisibility(ESlateVisibility::Hidden);
+			_shotgunAimUI->SetVisibility(ESlateVisibility::Hidden);
+			cameraComp->SetFieldOfView(90.0f);
+		}
+		break;
+	}
 }
