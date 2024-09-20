@@ -100,7 +100,6 @@ void APuckSlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 		EnhancedInputComponent->BindAction(LookUpIA, ETriggerEvent::Triggered, this, &APuckSlayer::LookUp);
 		EnhancedInputComponent->BindAction(TurnIA, ETriggerEvent::Triggered, this, &APuckSlayer::Turn);
 		EnhancedInputComponent->BindAction(JumpIA, ETriggerEvent::Triggered, this, &APuckSlayer::InputJump);
-		EnhancedInputComponent->BindAction(FireIA, ETriggerEvent::Started, this, &APuckSlayer::InputFire);
 
 		EnhancedInputComponent->BindAction(DashIA, ETriggerEvent::Started, this, &APuckSlayer::DashFunc);
 		EnhancedInputComponent->BindAction(ZoomIA, ETriggerEvent::Started, this, &APuckSlayer::ZoomFunc);
@@ -149,12 +148,6 @@ void APuckSlayer::Turn(const FInputActionValue& Value)
 void APuckSlayer::InputJump(const FInputActionValue& Value)
 {
 	Jump();
-}
-
-void APuckSlayer::InputFire(const FInputActionValue& Value)
-{
-	FTransform firePosition = WeaponMeshComp->GetSocketTransform(TEXT("FirePosition"));
-	GetWorld()->SpawnActor<APBullet>(magazine, firePosition);
 }
 
 void APuckSlayer::DashFunc(const FInputActionValue& value)
