@@ -167,11 +167,13 @@ void APuckSlayer::DashFunc(const FInputActionValue& value)
 
 void APuckSlayer::ZoomFunc(const FInputActionValue& value)
 {
+	this->bIsAiming = true;
 	this->SetWidgetVisible(true, currentEWType);
 }
 
 void APuckSlayer::ZoomOutFunc(const FInputActionValue& value)
 {
+	this->bIsAiming = false;
 	this->SetWidgetVisible(false, currentEWType);
 }
 
