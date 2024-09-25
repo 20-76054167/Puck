@@ -40,10 +40,6 @@ APuckSlayer::APuckSlayer()
 	cameraComp->bUsePawnControlRotation = false;
 
 	bUseControllerRotationYaw = true;
-
-	WeaponMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponMesh"));
-	WeaponMeshComp->SetupAttachment(GetMesh());
-	
 }
 
 // Called when the game starts or when spawned

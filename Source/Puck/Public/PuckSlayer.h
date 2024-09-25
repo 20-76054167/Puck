@@ -76,10 +76,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Control option")
 	bool isInvertLookUp = false;
 
-
-	UPROPERTY(VisibleAnywhere, Category="EquipItem")
-	class UStaticMeshComponent* WeaponMeshComp;
-
 	UPROPERTY(EditAnywhere)
 	class APLauncher* PLauncher;
 
@@ -105,4 +101,7 @@ public:
 	// 줌(우클릭) 하고 있는지를 추적하는 bool 변수
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State")
 	bool bIsAiming = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State")
+	int32 OwingWeaponNum = 0;
 };
