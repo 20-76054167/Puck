@@ -8,6 +8,7 @@
 #include "EWType.h"
 #include "PuckSlayer.generated.h"
 
+class UPuckWeaponComponent;
 class UInputMappingContext;
 class UInputAction;
 UCLASS()
@@ -104,4 +105,20 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State")
 	int32 OwingWeaponNum = 0;
+
+	UPROPERTY(EditAnywhere, Category = "Animation")
+	UAnimMontage* SwapMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Weapon")
+	UPuckWeaponComponent* Rifle;
+
+	UPROPERTY(EditAnywhere, Category = "Weapon")
+	UPuckWeaponComponent* Shotgun;
+
+private:
+	UPROPERTY(EditAnywhere, Category = "Weapon")
+	bool bRifle = true;
+
+	UPROPERTY(EditAnywhere, Category = "Weapon")
+	bool bShotgun = true;
 };

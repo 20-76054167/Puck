@@ -43,6 +43,9 @@ public:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Projectile Damage")
 	float BFG_Damage;
+
+	UPROPERTY(VisibleAnywhere, Category = "")
+	FName AttachedSocketName;
 	
 private:
 	UPROPERTY()

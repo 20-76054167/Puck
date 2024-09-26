@@ -10,11 +10,12 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "PBullet.h"
+#include "PuckWeaponComponent.h"
 
 // Sets default values
 APuckSlayer::APuckSlayer()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 
@@ -40,6 +41,10 @@ APuckSlayer::APuckSlayer()
 	cameraComp->bUsePawnControlRotation = false;
 
 	bUseControllerRotationYaw = true;
+
+	// Weapon Components
+	Rifle = CreateDefaultSubobject<UPuckWeaponComponent>(TEXT("Rifle"));
+	Shotgun = CreateDefaultSubobject<UPuckWeaponComponent>(TEXT("Shotgun"));
 }
 
 // Called when the game starts or when spawned
@@ -75,7 +80,10 @@ void APuckSlayer::BeginPlay()
 			_shotgunAimUI->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
-	
+	if (bRifle)
+		Rifle->AttachWeapon(this);
+	if (bShotgun)
+		Shotgun->AttachWeapon(this);
 }
 
 // Called every frame
@@ -177,12 +185,14 @@ void APuckSlayer::ChangeToShotgun(const FInputActionValue& value)
 {
 	currentEWType = EWType::Shotgun;
 	this->SetWidgetVisible(false, currentEWType);
+	if (SwapMontage) PlayAnimMontage(SwapMontage);
 }
 
 void APuckSlayer::ChangeToRifle(const FInputActionValue& value)
 {
 	currentEWType = EWType::Rifle;
 	this->SetWidgetVisible(false, currentEWType);
+	if (SwapMontage) PlayAnimMontage(SwapMontage);
 }
 
 void APuckSlayer::SetWidgetVisible(bool bVisible,  EWType weaponType)

@@ -27,11 +27,11 @@ bool UPuckWeaponComponent::AttachWeapon(class APuckSlayer* TargetCharacter)
 	// 	return false;
 	// }
 
-	FName SocketName = "WeaponSocket";
+	AttachedSocketName = "WeaponSocket";
 
 	if (Character->OwingWeaponNum == 1)
 	{
-		SocketName = "WeaponBackSocket";
+		AttachedSocketName = "WeaponBackSocket";
 	}
 	else if (Character->OwingWeaponNum > 1)
 	{
@@ -41,7 +41,7 @@ bool UPuckWeaponComponent::AttachWeapon(class APuckSlayer* TargetCharacter)
 
 	// Attach the weapon to the First Person Character
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-	AttachToComponent(Character->GetMesh(), AttachmentRules, SocketName);
+	AttachToComponent(Character->GetMesh(), AttachmentRules, AttachedSocketName);
 	
 	// add the weapon as an instance component to the character
 	Character->AddInstanceComponent(this);
