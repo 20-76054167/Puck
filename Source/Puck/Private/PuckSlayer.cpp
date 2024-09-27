@@ -10,24 +10,18 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "PBullet.h"
+#include "Animation/AnimMontage.h"
+#include "Animation/AnimInstance.h"
+#include "Animation/AnimSequence.h"
+#include "GameFramework/Actor.h"
+#include "Components/SkeletalMeshComponent.h"
 
 // Sets default values
 APuckSlayer::APuckSlayer()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> InitMesh(TEXT(""));
-
-	if (InitMesh.Succeeded())
-	{
-		GetMesh()->SetSkeletalMesh(InitMesh.Object);
-
-		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90), FRotator(0, -90, 0));
-
-	}
-
+	
 	springArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	springArmComp->SetupAttachment(RootComponent);
 	springArmComp->SetRelativeLocationAndRotation(FVector(0, 0, 50), FRotator(-20, 0, 0));
@@ -43,7 +37,6 @@ APuckSlayer::APuckSlayer()
 
 	WeaponMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponMesh"));
 	WeaponMeshComp->SetupAttachment(GetMesh());
-	
 }
 
 // Called when the game starts or when spawned
@@ -107,6 +100,7 @@ void APuckSlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 		EnhancedInputComponent->BindAction(ZoomIA, ETriggerEvent::Completed, this, &APuckSlayer::ZoomOutFunc);
 		EnhancedInputComponent->BindAction(ShotgunIA, ETriggerEvent::Started, this, &APuckSlayer::ChangeToShotgun);
 		EnhancedInputComponent->BindAction(RifleIA, ETriggerEvent::Started, this, &APuckSlayer::ChangeToRifle);
+		EnhancedInputComponent->BindAction(ExecutionIA, ETriggerEvent::Started, this, &APuckSlayer::Execution);
 	}
 }
 
@@ -192,6 +186,23 @@ void APuckSlayer::ChangeToRifle(const FInputActionValue& value)
 {
 	currentEWType = EWType::Rifle;
 	this->SetWidgetVisible(false, currentEWType);
+}
+
+void APuckSlayer::Execution(const FInputActionValue& value)
+{
+
+	if (ExecutionStab && GetMesh())
+	{
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		if (AnimInstance)
+		{
+			float MontageResult = AnimInstance->Montage_Play(ExecutionStab);
+		
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "Failed to play montage!");
+			
+			AnimInstance->Montage_Play(ExecutionStab);
+		}
+	}
 }
 
 void APuckSlayer::SetWidgetVisible(bool bVisible,  EWType weaponType)

@@ -33,7 +33,7 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	class USpringArmComponent* springArmComp;
 
-	UPROPERTY(VisibleAnywhere, Category = "Camera")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite ,Category = "Camera")
 	class UCameraComponent* cameraComp;
 
 	UPROPERTY(EditAnywhere, Category = "Input")
@@ -57,6 +57,8 @@ public:
 	UInputAction* ShotgunIA;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* RifleIA;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* ExecutionIA;
 
 
 	UPROPERTY(EditAnywhere, Category = "Fire")
@@ -72,17 +74,19 @@ public:
 	void ZoomOutFunc(const FInputActionValue& value);
 	void ChangeToShotgun(const FInputActionValue& value);
 	void ChangeToRifle(const FInputActionValue& value);
+	void Execution(const FInputActionValue& value);
 	
-
 	FVector MoveDirection;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Control option")
 	bool isInvertLookUp = false;
 
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Execution")
+	class UAnimMontage* ExecutionStab;
+	
 	UPROPERTY(VisibleAnywhere, Category="EquipItem")
 	class UStaticMeshComponent* WeaponMeshComp;
-
+	
 	UPROPERTY(EditAnywhere)
 	class APLauncher* PLauncher;
 
