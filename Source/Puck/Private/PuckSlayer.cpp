@@ -115,16 +115,19 @@ void APuckSlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 void APuckSlayer::Move(const FInputActionValue& Value)
 {
-	const FVector v = Value.Get<FVector>();
-	if (Controller)
-	{
-		MoveDirection.Y = v.X;
-		MoveDirection.X = v.Y;
-	}
+	const FVector MovementVector = Value.Get<FVector>();
 
-	MoveDirection = FTransform(GetControlRotation()).TransformVector(MoveDirection);
+	const FRotator Rotation = GetControlRotation();
+	const FRotator YawRotation = FRotator(0, Rotation.Yaw, 0);
+	// make rotation matrix by using Controller's Rotation
+	const FRotationMatrix RotationMatrix(YawRotation);
+
+	// get move dircetion
+	const FVector ForwardVector = RotationMatrix.GetUnitAxis(EAxis::X);
+	const FVector RightVector = RotationMatrix.GetUnitAxis(EAxis::Y);
+
+	const FVector MoveDirection = ForwardVector * MovementVector.Y + RightVector * MovementVector.X;
 	AddMovementInput(MoveDirection);
-	MoveDirection = FVector::ZeroVector;
 }
 
 void APuckSlayer::LookUp(const FInputActionValue& Value)

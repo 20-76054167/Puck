@@ -71,9 +71,6 @@ public:
 	void ChangeToShotgun(const FInputActionValue& value);
 	void ChangeToRifle(const FInputActionValue& value);
 	
-
-	FVector MoveDirection;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Control option")
 	bool isInvertLookUp = false;
 
