@@ -30,7 +30,7 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UPROPERTY(VisibleAnywhere, Category = "Camera")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Camera")
 	class USpringArmComponent* springArmComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite ,Category = "Camera")

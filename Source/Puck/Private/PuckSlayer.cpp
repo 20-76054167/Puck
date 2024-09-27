@@ -190,10 +190,6 @@ void APuckSlayer::Execution(const FInputActionValue& value)
 		if (AnimInstance)
 		{
 			float MontageResult = AnimInstance->Montage_Play(ExecutionStab);
-		
-				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "Failed to play montage!");
-			
-			AnimInstance->Montage_Play(ExecutionStab);
 		}
 	}
 }
