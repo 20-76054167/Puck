@@ -48,8 +48,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* JumpIA;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
-	UInputAction* FireIA;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* ZoomIA;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* DashIA;
@@ -68,7 +66,6 @@ public:
 	void LookUp(const FInputActionValue& Value);
 	void Turn(const FInputActionValue& Value);
 	void InputJump(const FInputActionValue& Value);
-	void InputFire(const FInputActionValue& Value);
 	void DashFunc(const FInputActionValue& value);
 	void ZoomFunc(const FInputActionValue& value);
 	void ZoomOutFunc(const FInputActionValue& value);

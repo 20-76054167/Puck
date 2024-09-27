@@ -93,8 +93,11 @@ Riderlink
 
 .idea
 
-# sjw
+# ParagonAsset
 MilitaryWeapSilver
 ParagonMurdock
-ParagonTwinblast
-/Content/ParagonGrux
+# ParagonTwinblast
+
+# WeaponAsset
+MilitaryWeapDark
+FPS_Weapon_Bundle
