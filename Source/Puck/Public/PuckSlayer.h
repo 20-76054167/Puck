@@ -95,11 +95,6 @@ public:
 	
 	void SetWidgetVisible(bool bVisible, EWType weaponType);
 
-public:
-	// 줌(우클릭) 하고 있는지를 추적하는 bool 변수
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State")
-	bool bIsAiming = false;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State")
 	int32 OwingWeaponNum = 0;
 
@@ -113,9 +108,30 @@ public:
 	UPuckWeaponComponent* Shotgun;
 
 private:
+	// 줌(우클릭) 하고 있는지를 추적하는 bool 변수
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", meta = (AllowPrivateAccess = "true"))
+	bool bIsAiming = false;
+	
 	UPROPERTY(EditAnywhere, Category = "Weapon")
 	bool bRifle = true;
 
 	UPROPERTY(EditAnywhere, Category = "Weapon")
 	bool bShotgun = true;
+
+	// 줌인 - 줌아웃 관련 변수들
+
+	// SpringArmLength 기본 / 줌
+	float DefaultSpringArmLength;
+	float ZoomedSpringArmLength;
+
+	// CameraRelativeLocation 기본 / 줌
+	FVector DefaultCameraRelativeLocation;
+	FVector ZoomedCameraRelativeLocation;
+
+	// Interpolation 속도
+	float ZoomInterpSpeed = 10.f;
+
+	// Target
+	float TargetSpringArmLength;
+	FVector TargetCameraRelativeLocation;
 };

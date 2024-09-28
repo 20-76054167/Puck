@@ -80,10 +80,23 @@ void APuckSlayer::BeginPlay()
 			_shotgunAimUI->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
+
+	// Rifle, Shotgun Equipment
 	if (bRifle)
 		Rifle->AttachWeapon(this);
 	if (bShotgun)
 		Shotgun->AttachWeapon(this);
+
+	// 줌 관련 변수들 초기화
+	DefaultSpringArmLength = springArmComp->TargetArmLength;
+	ZoomedSpringArmLength = 100.f;
+
+	DefaultCameraRelativeLocation = cameraComp->GetRelativeLocation();
+	ZoomedCameraRelativeLocation = DefaultCameraRelativeLocation + FVector(0.f, -20.f, 0.f);
+
+	// bIsAiming 옵션의 기본 값이 false -> target = default
+	TargetSpringArmLength = DefaultSpringArmLength;
+	TargetCameraRelativeLocation = DefaultCameraRelativeLocation;
 }
 
 // Called every frame

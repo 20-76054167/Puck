@@ -21,21 +21,21 @@ UPuckWeaponComponent::UPuckWeaponComponent()
 bool UPuckWeaponComponent::AttachWeapon(class APuckSlayer* TargetCharacter)
 {
 	Character = TargetCharacter;
-	// Check that the character is valid, and has no weapon component yet
-	// if (Character == nullptr || Character->GetInstanceComponents().FindItemByClass<UPuckWeaponComponent>())
-	// {
-	// 	return false;
-	// }
+	// Check that the character is valid
+	if (Character == nullptr)
+	{
+		return false;
+	}
 
+	// 플레이어가 두 개 미만의 무기를 가지고 있는지 확인
+	// 적절한 소켓 이름 결정
 	AttachedSocketName = "WeaponSocket";
-
 	if (Character->OwingWeaponNum == 1)
 	{
 		AttachedSocketName = "WeaponBackSocket";
 	}
 	else if (Character->OwingWeaponNum > 1)
 	{
-		// 이거 void 함수로 바꿔도 되지않나?
 		return false;
 	}
 
@@ -45,7 +45,7 @@ bool UPuckWeaponComponent::AttachWeapon(class APuckSlayer* TargetCharacter)
 	
 	// add the weapon as an instance component to the character
 	Character->AddInstanceComponent(this);
-	
+
 	if (APlayerController* PlayerController = Cast<APlayerController>(Character->GetController()))
 	{
 		
