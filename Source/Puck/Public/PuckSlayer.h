@@ -30,10 +30,10 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UPROPERTY(VisibleAnywhere, Category = "Camera")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Camera")
 	class USpringArmComponent* springArmComp;
 
-	UPROPERTY(VisibleAnywhere, Category = "Camera")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Camera")
 	class UCameraComponent* cameraComp;
 
 	UPROPERTY(EditAnywhere, Category = "Input")
@@ -55,6 +55,8 @@ public:
 	UInputAction* ShotgunIA;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* RifleIA;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* HookIA;
 
 
 	UPROPERTY(EditAnywhere, Category = "Fire")
@@ -69,7 +71,7 @@ public:
 	void ZoomOutFunc(const FInputActionValue& value);
 	void ChangeToShotgun(const FInputActionValue& value);
 	void ChangeToRifle(const FInputActionValue& value);
-	
+	void HookFunc(const FInputActionValue& value);
 
 	FVector MoveDirection;
 
@@ -82,6 +84,10 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class APLauncher* PLauncher;
+
+	UPROPERTY(EditAnywhere, Category="Widget")
+	TSubclassOf<class UUserWidget> normalAimUIFactory;
+	class UUserWidget* normalAimUI;
 
 	UPROPERTY(EditAnywhere, Category="Widget")
 	TSubclassOf<class UUserWidget> rifleAimUIFactory;
@@ -100,4 +106,6 @@ public:
 	FTimerHandle dashTimer;
 	
 	void SetWidgetVisible(bool bVisible, EWType weaponType);
+
+	//class UPhysicsConstraintComponent* hookContraint;
 };

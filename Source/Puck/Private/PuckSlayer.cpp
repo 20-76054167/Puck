@@ -6,10 +6,9 @@
 #include "Camera/CameraComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
-#include "PLauncher.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Blueprint/UserWidget.h"
-#include "PBullet.h"
+#include "PhysicsEngine/PhysicsConstraintComponent.h"
 
 // Sets default values
 APuckSlayer::APuckSlayer()
@@ -23,10 +22,11 @@ APuckSlayer::APuckSlayer()
 	if (InitMesh.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh(InitMesh.Object);
-
 		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90), FRotator(0, -90, 0));
-
 	}
+
+	//hookContraint = CreateDefaultSubobject<UPhysicsConstraintComponent>(FName("Hook Constraint"));
+	//hookContraint->SetupAttachment(GetMesh(), FName("HookMesh"));
 
 	springArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	springArmComp->SetupAttachment(RootComponent);
@@ -106,6 +106,7 @@ void APuckSlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 		EnhancedInputComponent->BindAction(ZoomIA, ETriggerEvent::Completed, this, &APuckSlayer::ZoomOutFunc);
 		EnhancedInputComponent->BindAction(ShotgunIA, ETriggerEvent::Started, this, &APuckSlayer::ChangeToShotgun);
 		EnhancedInputComponent->BindAction(RifleIA, ETriggerEvent::Started, this, &APuckSlayer::ChangeToRifle);
+		EnhancedInputComponent->BindAction(HookIA, ETriggerEvent::Started, this, &APuckSlayer::HookFunc);
 	}
 }
 
@@ -220,4 +221,11 @@ void APuckSlayer::SetWidgetVisible(bool bVisible,  EWType weaponType)
 		}
 		break;
 	}
+}
+
+
+void APuckSlayer::HookFunc(const FInputActionValue& value)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Start Hook"));
+	
 }
