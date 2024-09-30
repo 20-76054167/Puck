@@ -87,7 +87,7 @@ public:
 
 	UPROPERTY(EditAnywhere, Category="Widget")
 	TSubclassOf<class UUserWidget> normalAimUIFactory;
-	class UUserWidget* normalAimUI;
+	class UUserWidget* _normalAimUI;
 
 	UPROPERTY(EditAnywhere, Category="Widget")
 	TSubclassOf<class UUserWidget> rifleAimUIFactory;
