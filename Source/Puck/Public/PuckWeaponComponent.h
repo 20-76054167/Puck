@@ -43,6 +43,9 @@ public:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Projectile Damage")
 	float BFG_Damage;
+
+	UPROPERTY(VisibleAnywhere, Category = "")
+	FName AttachedSocketName;
 	
 private:
 	UPROPERTY()
@@ -52,4 +55,5 @@ protected:
 	/** Ends gameplay for this component. */
 	UFUNCTION()
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	virtual void BeginPlay() override;
 };

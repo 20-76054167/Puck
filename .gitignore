@@ -93,16 +93,18 @@ Riderlink
 
 .idea
 
-# sjw
-MilitaryWeapSilver
-ParagonMurdock
+
+
+# ParagonTwinblast
 ParagonGrux
 ParagonMurdock
 ParagonSevarog
 ParagonTwinblast
 
-# ParagonTwinblast
 
-Content/MilitaryWeapDark/
-Content/FPS_Weapon_Bundle/
-Content/AnimStarterPack/
+# WeaponAsset
+MilitaryWeapDark
+FPS_Weapon_Bundle
+AnimStarterPack
+MilitaryWeapSilver
+

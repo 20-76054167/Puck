@@ -10,11 +10,17 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "PBullet.h"
+#include "PuckWeaponComponent.h"
+#include "Animation/AnimMontage.h"
+#include "Animation/AnimInstance.h"
+#include "Animation/AnimSequence.h"
+#include "GameFramework/Actor.h"
+#include "Components/SkeletalMeshComponent.h"
 
 // Sets default values
 APuckSlayer::APuckSlayer()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 
@@ -27,7 +33,6 @@ APuckSlayer::APuckSlayer()
 		GetMesh()->SetSkeletalMesh(InitMesh.Object);
 
 		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90), FRotator(0, -90, 0));
-
 	}
 
 
@@ -40,13 +45,16 @@ APuckSlayer::APuckSlayer()
 
 	cameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 	cameraComp->SetupAttachment(springArmComp);
+	cameraComp->SetRelativeLocation(FVector(0.f, 0.f, 0.0f));
 	cameraComp->bUsePawnControlRotation = false;
+
+	GetCharacterMovement()->MaxWalkSpeed = 350.0f;
 
 	bUseControllerRotationYaw = true;
 
-	WeaponMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponMesh"));
-	WeaponMeshComp->SetupAttachment(GetMesh());
-	
+	// Weapon Components
+	Rifle = CreateDefaultSubobject<UPuckWeaponComponent>(TEXT("Rifle"));
+	Shotgun = CreateDefaultSubobject<UPuckWeaponComponent>(TEXT("Shotgun"));
 }
 
 // Called when the game starts or when spawned
@@ -82,7 +90,44 @@ void APuckSlayer::BeginPlay()
 			_shotgunAimUI->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
+
+	if(IsValid(normalAimUIFactory))
+	{
+		if(_normalAimUI == nullptr)
+		{
+			_normalAimUI = CreateWidget(GetWorld(), normalAimUIFactory);
+			_normalAimUI->AddToViewport();
+		}
+	}
 	
+	// Rifle, Shotgun Equipment
+	if (bRifle)
+	{
+		Rifle->AttachWeapon(this);
+		// 라이플을 먼저 장착했으니 라이플 상태로 설정
+		currentEWType = EWType::Rifle;
+	}
+	if (bShotgun)
+		Shotgun->AttachWeapon(this);
+
+	
+
+	// Zoom 변수 초기화
+	// Default
+	DefaultSpringArmLength = springArmComp->TargetArmLength;
+	DefaultCameraRelativeLocation = cameraComp->GetRelativeLocation();
+
+	// Rifle
+	ZoomedRifleSpringArmLength = 150.0f;
+	ZoomedRifleCameraRelativeLocation = DefaultCameraRelativeLocation + FVector(0.f, 30.f, 0.f);
+
+	// Shotgun
+	ZoomedShotgunSpringArmLength = 200.0f;
+	ZoomedShotgunCameraRelativeLocation = DefaultCameraRelativeLocation + FVector(0.f, 15.f, 0.f);
+
+	// bIsAiming 옵션의 기본 값이 false -> target = default
+	TargetSpringArmLength = DefaultSpringArmLength;
+	TargetCameraRelativeLocation = DefaultCameraRelativeLocation;
 }
 
 // Called every frame
@@ -90,6 +135,11 @@ void APuckSlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	float NewArmLength = FMath::FInterpTo(springArmComp->TargetArmLength, TargetSpringArmLength, DeltaTime, ZoomInterpSpeed);
+	springArmComp->TargetArmLength = NewArmLength;
+
+	FVector NewCameraRelativeLocation = FMath::VInterpTo(cameraComp->GetRelativeLocation(), TargetCameraRelativeLocation, DeltaTime, ZoomInterpSpeed);
+	cameraComp->SetRelativeLocation(NewCameraRelativeLocation);
 }
 
 // Called to bind functionality to input
@@ -109,21 +159,29 @@ void APuckSlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 		EnhancedInputComponent->BindAction(ZoomIA, ETriggerEvent::Completed, this, &APuckSlayer::ZoomOutFunc);
 		EnhancedInputComponent->BindAction(ShotgunIA, ETriggerEvent::Started, this, &APuckSlayer::ChangeToShotgun);
 		EnhancedInputComponent->BindAction(RifleIA, ETriggerEvent::Started, this, &APuckSlayer::ChangeToRifle);
+
+		// Run Start and End
+		EnhancedInputComponent->BindAction(RunIA, ETriggerEvent::Started, this, &APuckSlayer::RunStart);
+		EnhancedInputComponent->BindAction(RunIA, ETriggerEvent::Completed, this, &APuckSlayer::RunEnd);
+		EnhancedInputComponent->BindAction(ExecutionIA, ETriggerEvent::Started, this, &APuckSlayer::Execution);
 	}
 }
 
 void APuckSlayer::Move(const FInputActionValue& Value)
 {
-	const FVector v = Value.Get<FVector>();
-	if (Controller)
-	{
-		MoveDirection.Y = v.X;
-		MoveDirection.X = v.Y;
-	}
+	const FVector MovementVector = Value.Get<FVector>();
 
-	MoveDirection = FTransform(GetControlRotation()).TransformVector(MoveDirection);
+	const FRotator Rotation = GetControlRotation();
+	const FRotator YawRotation = FRotator(0, Rotation.Yaw, 0);
+	// make rotation matrix by using Controller's Rotation
+	const FRotationMatrix RotationMatrix(YawRotation);
+
+	// get move dircetion
+	const FVector ForwardVector = RotationMatrix.GetUnitAxis(EAxis::X);
+	const FVector RightVector = RotationMatrix.GetUnitAxis(EAxis::Y);
+
+	const FVector MoveDirection = ForwardVector * MovementVector.Y + RightVector * MovementVector.X;
 	AddMovementInput(MoveDirection);
-	MoveDirection = FVector::ZeroVector;
 }
 
 void APuckSlayer::LookUp(const FInputActionValue& Value)
@@ -155,12 +213,16 @@ void APuckSlayer::InputJump(const FInputActionValue& Value)
 
 void APuckSlayer::DashFunc(const FInputActionValue& value)
 {
-	FVector LaunchVelocity = GetActorForwardVector() * 1500;
+	FVector Velocity = GetCharacterMovement()->Velocity;
+	Velocity.Z = 0.0;
+	Velocity.Normalize();
+	
+	FVector LaunchVelocity = Velocity * 1500;
 	if (!GetCharacterMovement()->IsFalling())
 	{
 		GetCharacterMovement()->BrakingFrictionFactor = 0.0f; // 지면 마찰 감소
 	}
-	LaunchCharacter(LaunchVelocity, true, true);
+	LaunchCharacter(LaunchVelocity, true, false);
 	
 	GetWorldTimerManager().SetTimer(dashTimer, FTimerDelegate::CreateLambda([this]()->void
 	{
@@ -170,24 +232,102 @@ void APuckSlayer::DashFunc(const FInputActionValue& value)
 
 void APuckSlayer::ZoomFunc(const FInputActionValue& value)
 {
+	if (bIsRunning) return;
+	
+	this->bIsAiming = true;
 	this->SetWidgetVisible(true, currentEWType);
+
+	switch (currentEWType)
+	{
+	case EWType::Shotgun:
+		TargetSpringArmLength = ZoomedShotgunSpringArmLength;
+		TargetCameraRelativeLocation = ZoomedShotgunCameraRelativeLocation;
+		break;
+	case EWType::Rifle:
+		TargetSpringArmLength = ZoomedRifleSpringArmLength;
+		TargetCameraRelativeLocation = ZoomedRifleCameraRelativeLocation;
+		break;
+	default:
+		break;
+	}
 }
 
 void APuckSlayer::ZoomOutFunc(const FInputActionValue& value)
 {
+	// if (bIsRunning) return;
+	
+	this->bIsAiming = false;
 	this->SetWidgetVisible(false, currentEWType);
+
+	TargetSpringArmLength = DefaultSpringArmLength;
+	TargetCameraRelativeLocation = DefaultCameraRelativeLocation;
 }
 
 void APuckSlayer::ChangeToShotgun(const FInputActionValue& value)
 {
-	currentEWType = EWType::Shotgun;
+	// 이미 shotgun 인 경우 무시
+	if (currentEWType == EWType::Shotgun) return;
+
+	// SwapAnimNotifyState 클래스에서 타입 변경
+	// 이렇게 해야 스왑 중 다른 무기로 스왑하는 것을 막을 수 있음
+	// currentEWType = EWType::Shotgun;
+	
 	this->SetWidgetVisible(false, currentEWType);
+	if (SwapMontage) PlayAnimMontage(SwapMontage);
 }
 
 void APuckSlayer::ChangeToRifle(const FInputActionValue& value)
 {
-	currentEWType = EWType::Rifle;
+	// 이미 rifle 인 경우 무시
+	if (currentEWType == EWType::Rifle) return;
+
+	// SwapAnimNotifyState 클래스에서 타입 변경
+	// 이렇게 해야 스왑 중 다른 무기로 스왑하는 것을 막을 수 있음
+	// currentEWType = EWType::Rifle;
+	
 	this->SetWidgetVisible(false, currentEWType);
+	if (SwapMontage) PlayAnimMontage(SwapMontage);
+}
+
+void APuckSlayer::RunStart(const FInputActionValue& value)
+{
+	// ZoomOutFunc 내용인데 어캐 넣지 고민하다가 일단 그냥 넣음, 수정해야함
+	if (bIsAiming)
+	{
+		this->bIsAiming = false;
+		this->SetWidgetVisible(false, currentEWType);
+
+		TargetSpringArmLength = DefaultSpringArmLength;
+		TargetCameraRelativeLocation = DefaultCameraRelativeLocation;
+	}
+	//
+	
+	bIsRunning = true;
+	
+	if (bIsAiming)
+	{
+		bIsAiming = false;
+	}
+	
+	GetCharacterMovement()->MaxWalkSpeed = 700.0f;
+}
+
+void APuckSlayer::RunEnd(const FInputActionValue& value)
+{
+	bIsRunning = false;
+	GetCharacterMovement()->MaxWalkSpeed = 350.0f;
+}
+
+void APuckSlayer::Execution(const FInputActionValue& value)
+{
+	if (ExecutionStab && GetMesh())
+	{
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		if (AnimInstance)
+		{
+			float MontageResult = AnimInstance->Montage_Play(ExecutionStab);
+		}
+	}
 }
 
 void APuckSlayer::SetWidgetVisible(bool bVisible,  EWType weaponType)
@@ -199,13 +339,15 @@ void APuckSlayer::SetWidgetVisible(bool bVisible,  EWType weaponType)
 		{
 			_rifleAimUI->SetVisibility(ESlateVisibility::Hidden);
 			_shotgunAimUI->SetVisibility(ESlateVisibility::Visible);
-			cameraComp->SetFieldOfView(zoomInFloat);
+			_normalAimUI->SetVisibility(ESlateVisibility::Hidden);
+			// cameraComp->SetFieldOfView(zoomInFloat);
 		}
 		else
 		{
 			_rifleAimUI->SetVisibility(ESlateVisibility::Hidden);
 			_shotgunAimUI->SetVisibility(ESlateVisibility::Hidden);
-			cameraComp->SetFieldOfView(90.0f);
+			_normalAimUI->SetVisibility(ESlateVisibility::Visible);
+			// cameraComp->SetFieldOfView(90.0f);
 		}
 		break;
 	case EWType::Rifle :
@@ -213,13 +355,15 @@ void APuckSlayer::SetWidgetVisible(bool bVisible,  EWType weaponType)
 		{
 			_rifleAimUI->SetVisibility(ESlateVisibility::Visible);
 			_shotgunAimUI->SetVisibility(ESlateVisibility::Hidden);
-			cameraComp->SetFieldOfView(zoomInFloat);
+			_normalAimUI->SetVisibility(ESlateVisibility::Hidden);
+			// cameraComp->SetFieldOfView(zoomInFloat);
 		}
 		else
 		{
 			_rifleAimUI->SetVisibility(ESlateVisibility::Hidden);
 			_shotgunAimUI->SetVisibility(ESlateVisibility::Hidden);
-			cameraComp->SetFieldOfView(90.0f);
+			_normalAimUI->SetVisibility(ESlateVisibility::Visible);
+			// cameraComp->SetFieldOfView(90.0f);
 		}
 		break;
 	}
