@@ -30,6 +30,9 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+
+
+
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	class USpringArmComponent* springArmComp;
 
@@ -100,4 +103,9 @@ public:
 	FTimerHandle dashTimer;
 	
 	void SetWidgetVisible(bool bVisible, EWType weaponType);
+
+	
+	int32 SlayerHealth;
+
+	float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 };
