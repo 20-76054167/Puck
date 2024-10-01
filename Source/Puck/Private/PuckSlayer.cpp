@@ -24,6 +24,8 @@ APuckSlayer::APuckSlayer()
 	PrimaryActorTick.bCanEverTick = true;
 
 
+	SlayerHealth = 100;
+
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> InitMesh(TEXT(""));
 
 	if (InitMesh.Succeeded())
@@ -32,6 +34,7 @@ APuckSlayer::APuckSlayer()
 
 		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90), FRotator(0, -90, 0));
 	}
+
 
 	springArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	springArmComp->SetupAttachment(RootComponent);
@@ -364,4 +367,16 @@ void APuckSlayer::SetWidgetVisible(bool bVisible,  EWType weaponType)
 		}
 		break;
 	}
+}
+
+float APuckSlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	SlayerHealth -= DamageAmount;
+
+	UE_LOG(LogTemp, Warning, TEXT("Current_SlayerHealth : %d"), SlayerHealth);
+	if (SlayerHealth <= 0.0f)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Slayer Die!!!!!"));
+	}
+	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }

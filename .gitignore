@@ -93,16 +93,19 @@ Riderlink
 
 .idea
 
-# ParagonAsset
-MilitaryWeapSilver
-ParagonMurdock
-ParagonGrux
+
+
 # ParagonTwinblast
+ParagonGrux
+ParagonMurdock
+ParagonSevarog
+ParagonTwinblast
+
 
 # WeaponAsset
 MilitaryWeapDark
 FPS_Weapon_Bundle
 AnimStarterPack
-
+MilitaryWeapSilver
 
 Content/ParagonSevarog/

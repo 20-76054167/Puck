@@ -121,6 +121,12 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Weapon")
 	UPuckWeaponComponent* Shotgun;
 
+	//FVector MoveDirection;
+
+	int32 SlayerHealth;
+
+	float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
 private:
 	// 줌(우클릭) 하고 있는지를 추적하는 bool 변수
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", meta = (AllowPrivateAccess = "true"))
@@ -155,5 +161,6 @@ private:
 
 	// running
 	bool bIsRunning = false;
+	
 	
 };
