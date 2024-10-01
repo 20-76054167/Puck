@@ -56,6 +56,8 @@ public:
 	UInputAction* ShotgunIA;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* RifleIA;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* RunIA;
 
 
 	UPROPERTY(EditAnywhere, Category = "Fire")
@@ -70,6 +72,8 @@ public:
 	void ZoomOutFunc(const FInputActionValue& value);
 	void ChangeToShotgun(const FInputActionValue& value);
 	void ChangeToRifle(const FInputActionValue& value);
+	void RunStart(const FInputActionValue& value);
+	void RunEnd(const FInputActionValue& value);
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Control option")
 	bool isInvertLookUp = false;
@@ -120,18 +124,26 @@ private:
 
 	// 줌인 - 줌아웃 관련 변수들
 
-	// SpringArmLength 기본 / 줌
+	// Default SpringArmLength
 	float DefaultSpringArmLength;
-	float ZoomedSpringArmLength;
-
-	// CameraRelativeLocation 기본 / 줌
 	FVector DefaultCameraRelativeLocation;
-	FVector ZoomedCameraRelativeLocation;
 
-	// Interpolation 속도
-	float ZoomInterpSpeed = 10.f;
+	// Rifle
+	float ZoomedRifleSpringArmLength;
+	FVector ZoomedRifleCameraRelativeLocation;
+
+	// Shotgun
+	float ZoomedShotgunSpringArmLength;
+	FVector ZoomedShotgunCameraRelativeLocation;
 
 	// Target
 	float TargetSpringArmLength;
 	FVector TargetCameraRelativeLocation;
+	
+	// Interpolation 속도
+	float ZoomInterpSpeed = 10.f;
+
+	// running
+	bool bIsRunning = false;
+	
 };
