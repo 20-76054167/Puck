@@ -82,6 +82,15 @@ void APuckSlayer::BeginPlay()
 			_shotgunAimUI->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
+
+	if(IsValid(normalAimUIFactory))
+	{
+		if(_normalAimUI == nullptr)
+		{
+			_normalAimUI = CreateWidget(GetWorld(), normalAimUIFactory);
+			_normalAimUI->AddToViewport();
+		}
+	}
 	
 	// Rifle, Shotgun Equipment
 	if (bRifle)
@@ -309,12 +318,14 @@ void APuckSlayer::SetWidgetVisible(bool bVisible,  EWType weaponType)
 		{
 			_rifleAimUI->SetVisibility(ESlateVisibility::Hidden);
 			_shotgunAimUI->SetVisibility(ESlateVisibility::Visible);
+			_normalAimUI->SetVisibility(ESlateVisibility::Hidden);
 			// cameraComp->SetFieldOfView(zoomInFloat);
 		}
 		else
 		{
 			_rifleAimUI->SetVisibility(ESlateVisibility::Hidden);
 			_shotgunAimUI->SetVisibility(ESlateVisibility::Hidden);
+			_normalAimUI->SetVisibility(ESlateVisibility::Visible);
 			// cameraComp->SetFieldOfView(90.0f);
 		}
 		break;
@@ -323,12 +334,14 @@ void APuckSlayer::SetWidgetVisible(bool bVisible,  EWType weaponType)
 		{
 			_rifleAimUI->SetVisibility(ESlateVisibility::Visible);
 			_shotgunAimUI->SetVisibility(ESlateVisibility::Hidden);
+			_normalAimUI->SetVisibility(ESlateVisibility::Hidden);
 			// cameraComp->SetFieldOfView(zoomInFloat);
 		}
 		else
 		{
 			_rifleAimUI->SetVisibility(ESlateVisibility::Hidden);
 			_shotgunAimUI->SetVisibility(ESlateVisibility::Hidden);
+			_normalAimUI->SetVisibility(ESlateVisibility::Visible);
 			// cameraComp->SetFieldOfView(90.0f);
 		}
 		break;

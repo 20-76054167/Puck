@@ -31,10 +31,10 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UPROPERTY(VisibleAnywhere, Category = "Camera")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	class USpringArmComponent* springArmComp;
 
-	UPROPERTY(VisibleAnywhere, Category = "Camera")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	class UCameraComponent* cameraComp;
 
 	UPROPERTY(EditAnywhere, Category = "Input")
@@ -80,6 +80,10 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class APLauncher* PLauncher;
+
+	UPROPERTY(EditAnywhere, Category="Widget")
+	TSubclassOf<class UUserWidget> normalAimUIFactory;
+	class UUserWidget* _normalAimUI;
 
 	UPROPERTY(EditAnywhere, Category="Widget")
 	TSubclassOf<class UUserWidget> rifleAimUIFactory;

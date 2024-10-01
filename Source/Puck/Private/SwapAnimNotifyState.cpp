@@ -43,8 +43,6 @@ void USwapAnimNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSe
 	EquippedWeapon->AttachedSocketName = "WeaponBackSocket";
 	BackWeapon->AttachToComponent(MeshComp, AttachmentRules, "WeaponSocket");
 	BackWeapon->AttachedSocketName = "WeaponSocket";
-
-	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("NotifyBegin")));
 }
 
 void USwapAnimNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,
