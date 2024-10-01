@@ -11,6 +11,11 @@
 #include "Blueprint/UserWidget.h"
 #include "PBullet.h"
 #include "PuckWeaponComponent.h"
+#include "Animation/AnimMontage.h"
+#include "Animation/AnimInstance.h"
+#include "Animation/AnimSequence.h"
+#include "GameFramework/Actor.h"
+#include "Components/SkeletalMeshComponent.h"
 
 // Sets default values
 APuckSlayer::APuckSlayer()
@@ -155,6 +160,7 @@ void APuckSlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 		// Run Start and End
 		EnhancedInputComponent->BindAction(RunIA, ETriggerEvent::Started, this, &APuckSlayer::RunStart);
 		EnhancedInputComponent->BindAction(RunIA, ETriggerEvent::Completed, this, &APuckSlayer::RunEnd);
+		EnhancedInputComponent->BindAction(ExecutionIA, ETriggerEvent::Started, this, &APuckSlayer::Execution);
 	}
 }
 
@@ -307,6 +313,18 @@ void APuckSlayer::RunEnd(const FInputActionValue& value)
 {
 	bIsRunning = false;
 	GetCharacterMovement()->MaxWalkSpeed = 350.0f;
+}
+
+void APuckSlayer::Execution(const FInputActionValue& value)
+{
+	if (ExecutionStab && GetMesh())
+	{
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		if (AnimInstance)
+		{
+			float MontageResult = AnimInstance->Montage_Play(ExecutionStab);
+		}
+	}
 }
 
 void APuckSlayer::SetWidgetVisible(bool bVisible,  EWType weaponType)

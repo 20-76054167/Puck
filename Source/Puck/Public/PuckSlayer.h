@@ -58,6 +58,8 @@ public:
 	UInputAction* RifleIA;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* RunIA;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* ExecutionIA;
 
 
 	UPROPERTY(EditAnywhere, Category = "Fire")
@@ -74,10 +76,14 @@ public:
 	void ChangeToRifle(const FInputActionValue& value);
 	void RunStart(const FInputActionValue& value);
 	void RunEnd(const FInputActionValue& value);
+	void Execution(const FInputActionValue& value);
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Control option")
 	bool isInvertLookUp = false;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Execution")
+	class UAnimMontage* ExecutionStab;
+	
 	UPROPERTY(EditAnywhere)
 	class APLauncher* PLauncher;
 
