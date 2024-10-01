@@ -21,19 +21,31 @@ UPuckWeaponComponent::UPuckWeaponComponent()
 bool UPuckWeaponComponent::AttachWeapon(class APuckSlayer* TargetCharacter)
 {
 	Character = TargetCharacter;
-	// Check that the character is valid, and has no weapon component yet
-	// if (Character == nullptr || Character->GetInstanceComponents().FindItemByClass<UPuckWeaponComponent>())
-	// {
-	// 	return false;
-	// }
+	// Check that the character is valid
+	if (Character == nullptr)
+	{
+		return false;
+	}
+
+	// 플레이어가 두 개 미만의 무기를 가지고 있는지 확인
+	// 적절한 소켓 이름 결정
+	AttachedSocketName = "WeaponSocket";
+	if (Character->OwingWeaponNum == 1)
+	{
+		AttachedSocketName = "WeaponBackSocket";
+	}
+	else if (Character->OwingWeaponNum > 1)
+	{
+		return false;
+	}
 
 	// Attach the weapon to the First Person Character
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-	AttachToComponent(Character->GetMesh(), AttachmentRules, FName(TEXT("WeaponSocket")));
+	AttachToComponent(Character->GetMesh(), AttachmentRules, AttachedSocketName);
 	
 	// add the weapon as an instance component to the character
 	Character->AddInstanceComponent(this);
-	
+
 	if (APlayerController* PlayerController = Cast<APlayerController>(Character->GetController()))
 	{
 		
@@ -48,6 +60,7 @@ bool UPuckWeaponComponent::AttachWeapon(class APuckSlayer* TargetCharacter)
 			EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &UPuckWeaponComponent::Fire);
 		}
 	}
+	Character->OwingWeaponNum++;
 	return true;
 }
 
@@ -116,4 +129,15 @@ void UPuckWeaponComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 			Subsystem->RemoveMappingContext(FireMappingContext);
 		}
 	}
+}
+
+/** AttackWeapon 을 사용해 시작하자마자 무기를 들고 있게 함
+ * 분명 더 나은 풀이가 있겠지만.. 일단 이렇게 두자
+*/
+void UPuckWeaponComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// auto* PuckSlayer = Cast<APuckSlayer>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	// AttachWeapon(PuckSlayer);
 }

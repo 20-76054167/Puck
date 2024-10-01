@@ -8,6 +8,7 @@
 #include "EWType.h"
 #include "PuckSlayer.generated.h"
 
+class UPuckWeaponComponent;
 class UInputMappingContext;
 class UInputAction;
 UCLASS()
@@ -30,10 +31,10 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Camera")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	class USpringArmComponent* springArmComp;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite ,Category = "Camera")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	class UCameraComponent* cameraComp;
 
 	UPROPERTY(EditAnywhere, Category = "Input")
@@ -56,7 +57,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* RifleIA;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
-	UInputAction* ExecutionIA;
+	UInputAction* RunIA;
 
 
 	UPROPERTY(EditAnywhere, Category = "Fire")
@@ -71,21 +72,18 @@ public:
 	void ZoomOutFunc(const FInputActionValue& value);
 	void ChangeToShotgun(const FInputActionValue& value);
 	void ChangeToRifle(const FInputActionValue& value);
-	void Execution(const FInputActionValue& value);
+	void RunStart(const FInputActionValue& value);
+	void RunEnd(const FInputActionValue& value);
 	
-	FVector MoveDirection;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Control option")
 	bool isInvertLookUp = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Execution")
-	class UAnimMontage* ExecutionStab;
-	
-	UPROPERTY(VisibleAnywhere, Category="EquipItem")
-	class UStaticMeshComponent* WeaponMeshComp;
-	
 	UPROPERTY(EditAnywhere)
 	class APLauncher* PLauncher;
+
+	UPROPERTY(EditAnywhere, Category="Widget")
+	TSubclassOf<class UUserWidget> normalAimUIFactory;
+	class UUserWidget* _normalAimUI;
 
 	UPROPERTY(EditAnywhere, Category="Widget")
 	TSubclassOf<class UUserWidget> rifleAimUIFactory;
@@ -104,4 +102,52 @@ public:
 	FTimerHandle dashTimer;
 	
 	void SetWidgetVisible(bool bVisible, EWType weaponType);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State")
+	int32 OwingWeaponNum = 0;
+
+	UPROPERTY(EditAnywhere, Category = "Animation")
+	UAnimMontage* SwapMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Weapon")
+	UPuckWeaponComponent* Rifle;
+
+	UPROPERTY(EditAnywhere, Category = "Weapon")
+	UPuckWeaponComponent* Shotgun;
+
+private:
+	// 줌(우클릭) 하고 있는지를 추적하는 bool 변수
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", meta = (AllowPrivateAccess = "true"))
+	bool bIsAiming = false;
+	
+	UPROPERTY(EditAnywhere, Category = "Weapon")
+	bool bRifle = true;
+
+	UPROPERTY(EditAnywhere, Category = "Weapon")
+	bool bShotgun = true;
+
+	// 줌인 - 줌아웃 관련 변수들
+
+	// Default SpringArmLength
+	float DefaultSpringArmLength;
+	FVector DefaultCameraRelativeLocation;
+
+	// Rifle
+	float ZoomedRifleSpringArmLength;
+	FVector ZoomedRifleCameraRelativeLocation;
+
+	// Shotgun
+	float ZoomedShotgunSpringArmLength;
+	FVector ZoomedShotgunCameraRelativeLocation;
+
+	// Target
+	float TargetSpringArmLength;
+	FVector TargetCameraRelativeLocation;
+	
+	// Interpolation 속도
+	float ZoomInterpSpeed = 10.f;
+
+	// running
+	bool bIsRunning = false;
+	
 };
