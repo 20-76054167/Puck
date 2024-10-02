@@ -6,10 +6,8 @@
 #include "Camera/CameraComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
-#include "PLauncher.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Blueprint/UserWidget.h"
-#include "PBullet.h"
 #include "PuckWeaponComponent.h"
 #include "Animation/AnimMontage.h"
 #include "Animation/AnimInstance.h"
@@ -26,27 +24,16 @@ APuckSlayer::APuckSlayer()
 
 	SlayerHealth = 100;
 
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> InitMesh(TEXT(""));
+	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
+	SpringArmComp->SetupAttachment(RootComponent);
+	SpringArmComp->SetRelativeLocationAndRotation(FVector(0, 0, 50), FRotator(-20, 0, 0));
+	SpringArmComp->TargetArmLength = 250;
+	SpringArmComp->bUsePawnControlRotation = true;
 
-	if (InitMesh.Succeeded())
-	{
-		GetMesh()->SetSkeletalMesh(InitMesh.Object);
-
-		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90), FRotator(0, -90, 0));
-	}
-
-
-	springArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
-	springArmComp->SetupAttachment(RootComponent);
-	springArmComp->SetRelativeLocationAndRotation(FVector(0, 0, 50), FRotator(-20, 0, 0));
-	springArmComp->TargetArmLength = 250;
-	springArmComp->bUsePawnControlRotation = true;
-
-
-	cameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
-	cameraComp->SetupAttachment(springArmComp);
-	cameraComp->SetRelativeLocation(FVector(0.f, 0.f, 0.0f));
-	cameraComp->bUsePawnControlRotation = false;
+	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
+	CameraComp->SetupAttachment(SpringArmComp);
+	CameraComp->SetRelativeLocation(FVector(0.f, 0.f, 0.0f));
+	CameraComp->bUsePawnControlRotation = false;
 
 	GetCharacterMovement()->MaxWalkSpeed = 350.0f;
 
@@ -71,32 +58,32 @@ void APuckSlayer::BeginPlay()
 		}
 	}
 
-	if(IsValid(rifleAimUIFactory))
+	if(IsValid(RifleAimUIFactory))
 	{
-		if(_rifleAimUI == nullptr)
+		if(RifleAimUI == nullptr)
 		{
-			_rifleAimUI = CreateWidget(GetWorld(), rifleAimUIFactory);
-			_rifleAimUI->AddToViewport();
-			_rifleAimUI->SetVisibility(ESlateVisibility::Hidden);
+			RifleAimUI = CreateWidget(GetWorld(), RifleAimUIFactory);
+			RifleAimUI->AddToViewport();
+			RifleAimUI->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
 
-	if(IsValid(shotgunAimUIFactory))
+	if(IsValid(ShotgunAimUIFactory))
 	{
-		if(_shotgunAimUI == nullptr)
+		if(ShotgunAimUI == nullptr)
 		{
-			_shotgunAimUI = CreateWidget(GetWorld(), shotgunAimUIFactory);
-			_shotgunAimUI->AddToViewport();
-			_shotgunAimUI->SetVisibility(ESlateVisibility::Hidden);
+			ShotgunAimUI = CreateWidget(GetWorld(), ShotgunAimUIFactory);
+			ShotgunAimUI->AddToViewport();
+			ShotgunAimUI->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
 
-	if(IsValid(normalAimUIFactory))
+	if(IsValid(NormalAimUIFactory))
 	{
-		if(_normalAimUI == nullptr)
+		if(NormalAimUI == nullptr)
 		{
-			_normalAimUI = CreateWidget(GetWorld(), normalAimUIFactory);
-			_normalAimUI->AddToViewport();
+			NormalAimUI = CreateWidget(GetWorld(), NormalAimUIFactory);
+			NormalAimUI->AddToViewport();
 		}
 	}
 	
@@ -105,7 +92,7 @@ void APuckSlayer::BeginPlay()
 	{
 		Rifle->AttachWeapon(this);
 		// 라이플을 먼저 장착했으니 라이플 상태로 설정
-		currentEWType = EWType::Rifle;
+		CurrentEwType = EWType::Rifle;
 	}
 	if (bShotgun)
 		Shotgun->AttachWeapon(this);
@@ -114,8 +101,8 @@ void APuckSlayer::BeginPlay()
 
 	// Zoom 변수 초기화
 	// Default
-	DefaultSpringArmLength = springArmComp->TargetArmLength;
-	DefaultCameraRelativeLocation = cameraComp->GetRelativeLocation();
+	DefaultSpringArmLength = SpringArmComp->TargetArmLength;
+	DefaultCameraRelativeLocation = CameraComp->GetRelativeLocation();
 
 	// Rifle
 	ZoomedRifleSpringArmLength = 150.0f;
@@ -135,11 +122,12 @@ void APuckSlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	float NewArmLength = FMath::FInterpTo(springArmComp->TargetArmLength, TargetSpringArmLength, DeltaTime, ZoomInterpSpeed);
-	springArmComp->TargetArmLength = NewArmLength;
+	// bIsAiming 에 따라 보간 목표를 진행한다
+	float NewArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetSpringArmLength, DeltaTime, ZoomInterpSpeed);
+	SpringArmComp->TargetArmLength = NewArmLength;
 
-	FVector NewCameraRelativeLocation = FMath::VInterpTo(cameraComp->GetRelativeLocation(), TargetCameraRelativeLocation, DeltaTime, ZoomInterpSpeed);
-	cameraComp->SetRelativeLocation(NewCameraRelativeLocation);
+	FVector NewCameraRelativeLocation = FMath::VInterpTo(CameraComp->GetRelativeLocation(), TargetCameraRelativeLocation, DeltaTime, ZoomInterpSpeed);
+	CameraComp->SetRelativeLocation(NewCameraRelativeLocation);
 }
 
 // Called to bind functionality to input
@@ -187,7 +175,7 @@ void APuckSlayer::Move(const FInputActionValue& Value)
 void APuckSlayer::LookUp(const FInputActionValue& Value)
 {
 	float v;
-	if (isInvertLookUp)
+	if (bIsInvertLookUp)
 	{
 		v = Value.Get<float>();
 	}
@@ -211,7 +199,7 @@ void APuckSlayer::InputJump(const FInputActionValue& Value)
 	Jump();
 }
 
-void APuckSlayer::DashFunc(const FInputActionValue& value)
+void APuckSlayer::DashFunc(const FInputActionValue& Value)
 {
 	FVector Velocity = GetCharacterMovement()->Velocity;
 	Velocity.Z = 0.0;
@@ -224,20 +212,20 @@ void APuckSlayer::DashFunc(const FInputActionValue& value)
 	}
 	LaunchCharacter(LaunchVelocity, true, false);
 	
-	GetWorldTimerManager().SetTimer(dashTimer, FTimerDelegate::CreateLambda([this]()->void
+	GetWorldTimerManager().SetTimer(DashTimer, FTimerDelegate::CreateLambda([this]()->void
 	{
 		GetCharacterMovement()->BrakingFrictionFactor = 2.0f;
 	}), 0.5f, false);
 }
 
-void APuckSlayer::ZoomFunc(const FInputActionValue& value)
+void APuckSlayer::ZoomFunc(const FInputActionValue& Value)
 {
 	if (bIsRunning) return;
 	
 	this->bIsAiming = true;
-	this->SetWidgetVisible(true, currentEWType);
+	this->SetWidgetVisible(true, CurrentEwType);
 
-	switch (currentEWType)
+	switch (CurrentEwType)
 	{
 	case EWType::Shotgun:
 		TargetSpringArmLength = ZoomedShotgunSpringArmLength;
@@ -252,50 +240,50 @@ void APuckSlayer::ZoomFunc(const FInputActionValue& value)
 	}
 }
 
-void APuckSlayer::ZoomOutFunc(const FInputActionValue& value)
+void APuckSlayer::ZoomOutFunc(const FInputActionValue& Value)
 {
 	// if (bIsRunning) return;
 	
 	this->bIsAiming = false;
-	this->SetWidgetVisible(false, currentEWType);
+	this->SetWidgetVisible(false, CurrentEwType);
 
 	TargetSpringArmLength = DefaultSpringArmLength;
 	TargetCameraRelativeLocation = DefaultCameraRelativeLocation;
 }
 
-void APuckSlayer::ChangeToShotgun(const FInputActionValue& value)
+void APuckSlayer::ChangeToShotgun(const FInputActionValue& Value)
 {
 	// 이미 shotgun 인 경우 무시
-	if (currentEWType == EWType::Shotgun) return;
+	if (CurrentEwType == EWType::Shotgun) return;
 
 	// SwapAnimNotifyState 클래스에서 타입 변경
 	// 이렇게 해야 스왑 중 다른 무기로 스왑하는 것을 막을 수 있음
 	// currentEWType = EWType::Shotgun;
 	
-	this->SetWidgetVisible(false, currentEWType);
+	this->SetWidgetVisible(false, CurrentEwType);
 	if (SwapMontage) PlayAnimMontage(SwapMontage);
 }
 
-void APuckSlayer::ChangeToRifle(const FInputActionValue& value)
+void APuckSlayer::ChangeToRifle(const FInputActionValue& Value)
 {
 	// 이미 rifle 인 경우 무시
-	if (currentEWType == EWType::Rifle) return;
+	if (CurrentEwType == EWType::Rifle) return;
 
 	// SwapAnimNotifyState 클래스에서 타입 변경
 	// 이렇게 해야 스왑 중 다른 무기로 스왑하는 것을 막을 수 있음
 	// currentEWType = EWType::Rifle;
 	
-	this->SetWidgetVisible(false, currentEWType);
+	this->SetWidgetVisible(false, CurrentEwType);
 	if (SwapMontage) PlayAnimMontage(SwapMontage);
 }
 
-void APuckSlayer::RunStart(const FInputActionValue& value)
+void APuckSlayer::RunStart(const FInputActionValue& Value)
 {
 	// ZoomOutFunc 내용인데 어캐 넣지 고민하다가 일단 그냥 넣음, 수정해야함
 	if (bIsAiming)
 	{
 		this->bIsAiming = false;
-		this->SetWidgetVisible(false, currentEWType);
+		this->SetWidgetVisible(false, CurrentEwType);
 
 		TargetSpringArmLength = DefaultSpringArmLength;
 		TargetCameraRelativeLocation = DefaultCameraRelativeLocation;
@@ -312,13 +300,13 @@ void APuckSlayer::RunStart(const FInputActionValue& value)
 	GetCharacterMovement()->MaxWalkSpeed = 700.0f;
 }
 
-void APuckSlayer::RunEnd(const FInputActionValue& value)
+void APuckSlayer::RunEnd(const FInputActionValue& Value)
 {
 	bIsRunning = false;
 	GetCharacterMovement()->MaxWalkSpeed = 350.0f;
 }
 
-void APuckSlayer::Execution(const FInputActionValue& value)
+void APuckSlayer::Execution(const FInputActionValue& Value)
 {
 	if (ExecutionStab && GetMesh())
 	{
@@ -330,39 +318,39 @@ void APuckSlayer::Execution(const FInputActionValue& value)
 	}
 }
 
-void APuckSlayer::SetWidgetVisible(bool bVisible,  EWType weaponType)
+void APuckSlayer::SetWidgetVisible(bool bVisible,  EWType WeaponType)
 {
-	switch (weaponType)
+	switch (WeaponType)
 	{
 	case EWType::Shotgun :
 		if(bVisible)
 		{
-			_rifleAimUI->SetVisibility(ESlateVisibility::Hidden);
-			_shotgunAimUI->SetVisibility(ESlateVisibility::Visible);
-			_normalAimUI->SetVisibility(ESlateVisibility::Hidden);
+			RifleAimUI->SetVisibility(ESlateVisibility::Hidden);
+			ShotgunAimUI->SetVisibility(ESlateVisibility::Visible);
+			NormalAimUI->SetVisibility(ESlateVisibility::Hidden);
 			// cameraComp->SetFieldOfView(zoomInFloat);
 		}
 		else
 		{
-			_rifleAimUI->SetVisibility(ESlateVisibility::Hidden);
-			_shotgunAimUI->SetVisibility(ESlateVisibility::Hidden);
-			_normalAimUI->SetVisibility(ESlateVisibility::Visible);
+			RifleAimUI->SetVisibility(ESlateVisibility::Hidden);
+			ShotgunAimUI->SetVisibility(ESlateVisibility::Hidden);
+			NormalAimUI->SetVisibility(ESlateVisibility::Visible);
 			// cameraComp->SetFieldOfView(90.0f);
 		}
 		break;
 	case EWType::Rifle :
 		if(bVisible)
 		{
-			_rifleAimUI->SetVisibility(ESlateVisibility::Visible);
-			_shotgunAimUI->SetVisibility(ESlateVisibility::Hidden);
-			_normalAimUI->SetVisibility(ESlateVisibility::Hidden);
+			RifleAimUI->SetVisibility(ESlateVisibility::Visible);
+			ShotgunAimUI->SetVisibility(ESlateVisibility::Hidden);
+			NormalAimUI->SetVisibility(ESlateVisibility::Hidden);
 			// cameraComp->SetFieldOfView(zoomInFloat);
 		}
 		else
 		{
-			_rifleAimUI->SetVisibility(ESlateVisibility::Hidden);
-			_shotgunAimUI->SetVisibility(ESlateVisibility::Hidden);
-			_normalAimUI->SetVisibility(ESlateVisibility::Visible);
+			RifleAimUI->SetVisibility(ESlateVisibility::Hidden);
+			ShotgunAimUI->SetVisibility(ESlateVisibility::Hidden);
+			NormalAimUI->SetVisibility(ESlateVisibility::Visible);
 			// cameraComp->SetFieldOfView(90.0f);
 		}
 		break;
