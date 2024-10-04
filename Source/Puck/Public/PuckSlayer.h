@@ -32,10 +32,10 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
-	class USpringArmComponent* springArmComp;
+	class USpringArmComponent* SpringArmComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
-	class UCameraComponent* cameraComp;
+	class UCameraComponent* CameraComp;
 
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputMappingContext* PlayerMappingContext;
@@ -63,23 +63,23 @@ public:
 
 
 	UPROPERTY(EditAnywhere, Category = "Fire")
-	TSubclassOf<class APBullet> magazine;
+	TSubclassOf<class APBullet> Magazine;
 
 	void Move(const FInputActionValue& Value);
 	void LookUp(const FInputActionValue& Value);
 	void Turn(const FInputActionValue& Value);
 	void InputJump(const FInputActionValue& Value);
-	void DashFunc(const FInputActionValue& value);
-	void ZoomFunc(const FInputActionValue& value);
-	void ZoomOutFunc(const FInputActionValue& value);
-	void ChangeToShotgun(const FInputActionValue& value);
-	void ChangeToRifle(const FInputActionValue& value);
-	void RunStart(const FInputActionValue& value);
-	void RunEnd(const FInputActionValue& value);
-	void Execution(const FInputActionValue& value);
+	void DashFunc(const FInputActionValue& Value);
+	void ZoomFunc(const FInputActionValue& Value);
+	void ZoomOutFunc(const FInputActionValue& Value);
+	void ChangeToShotgun(const FInputActionValue& Value);
+	void ChangeToRifle(const FInputActionValue& Value);
+	void RunStart(const FInputActionValue& Value);
+	void RunEnd(const FInputActionValue& Value);
+	void Execution(const FInputActionValue& Value);
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Control option")
-	bool isInvertLookUp = false;
+	bool bIsInvertLookUp = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Execution")
 	class UAnimMontage* ExecutionStab;
@@ -88,26 +88,26 @@ public:
 	class APLauncher* PLauncher;
 
 	UPROPERTY(EditAnywhere, Category="Widget")
-	TSubclassOf<class UUserWidget> normalAimUIFactory;
-	class UUserWidget* _normalAimUI;
+	TSubclassOf<class UUserWidget> NormalAimUIFactory;
+	class UUserWidget* NormalAimUI;
 
 	UPROPERTY(EditAnywhere, Category="Widget")
-	TSubclassOf<class UUserWidget> rifleAimUIFactory;
-	class UUserWidget* _rifleAimUI;
+	TSubclassOf<class UUserWidget> RifleAimUIFactory;
+	class UUserWidget* RifleAimUI;
 
 	UPROPERTY(EditAnywhere, Category="Widget")
-	TSubclassOf<class UUserWidget> shotgunAimUIFactory;
-	class UUserWidget* _shotgunAimUI;
+	TSubclassOf<class UUserWidget> ShotgunAimUIFactory;
+	class UUserWidget* ShotgunAimUI;
 	
 	UPROPERTY(EditAnywhere, Category="Widget")
-	float zoomInFloat = 50.0f;
+	float ZoomInFloat = 50.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="State")
-	EWType currentEWType;
+	EWType CurrentEwType;
 
-	FTimerHandle dashTimer;
+	FTimerHandle DashTimer;
 	
-	void SetWidgetVisible(bool bVisible, EWType weaponType);
+	void SetWidgetVisible(bool bVisible, EWType WeaponType);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State")
 	int32 OwingWeaponNum = 0;

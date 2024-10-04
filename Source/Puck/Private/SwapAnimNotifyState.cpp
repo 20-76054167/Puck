@@ -49,12 +49,12 @@ void USwapAnimNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequ
 	const FAnimNotifyEventReference& EventReference)
 {
 	Super::NotifyEnd(MeshComp, Animation, EventReference);
-	if (PuckSlayer->currentEWType == EWType::Rifle)
+	if (PuckSlayer->CurrentEwType == EWType::Rifle)
 	{
-		PuckSlayer->currentEWType = EWType::Shotgun;
+		PuckSlayer->CurrentEwType = EWType::Shotgun;
 	}
 	else
 	{
-		PuckSlayer->currentEWType = EWType::Rifle;
+		PuckSlayer->CurrentEwType = EWType::Rifle;
 	}
 }
