@@ -16,6 +16,7 @@
 #include "Animation/AnimSequence.h"
 #include "GameFramework/Actor.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "FireActorComponent.h"
 
 // Sets default values
 APuckSlayer::APuckSlayer()
@@ -55,6 +56,8 @@ APuckSlayer::APuckSlayer()
 	// Weapon Components
 	Rifle = CreateDefaultSubobject<UPuckWeaponComponent>(TEXT("Rifle"));
 	Shotgun = CreateDefaultSubobject<UPuckWeaponComponent>(TEXT("Shotgun"));
+
+	fireActorComp = CreateDefaultSubobject<UFireActorComponent>(TEXT("FireActorComp"));
 }
 
 // Called when the game starts or when spawned
@@ -110,8 +113,6 @@ void APuckSlayer::BeginPlay()
 	if (bShotgun)
 		Shotgun->AttachWeapon(this);
 
-	
-
 	// Zoom 변수 초기화
 	// Default
 	DefaultSpringArmLength = springArmComp->TargetArmLength;
@@ -128,6 +129,7 @@ void APuckSlayer::BeginPlay()
 	// bIsAiming 옵션의 기본 값이 false -> target = default
 	TargetSpringArmLength = DefaultSpringArmLength;
 	TargetCameraRelativeLocation = DefaultCameraRelativeLocation;
+	
 }
 
 // Called every frame

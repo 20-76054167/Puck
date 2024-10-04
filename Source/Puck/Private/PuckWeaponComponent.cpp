@@ -7,6 +7,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "FireActorComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
@@ -72,7 +73,7 @@ void UPuckWeaponComponent::Fire()
 		return;
 	}
 	// Try and fire a projectile
-	if (BFG_ProjectileClass != nullptr)
+	/*if (BFG_ProjectileClass != nullptr)
 	{
 		UWorld* const World = GetWorld();
 		if (World != nullptr)
@@ -112,7 +113,31 @@ void UPuckWeaponComponent::Fire()
 				Projectile->SetActorRotation(SpawnRotation);
 			}
 		}
+	}*/
+
+	APuckSlayer* puckCharac = Cast<APuckSlayer>(Character);
+	if (puckCharac != nullptr)
+	{
+		//puckCharac->fireActorComp->FireByTrace();
+		UAnimInstance* AnimInstance = puckCharac->GetMesh()->GetAnimInstance();
+		if(AnimInstance)
+		{
+			int32 testMana = puckCharac->fireActorComp->magazine;
+			UE_LOG(LogTemp, Warning, TEXT("%d"), testMana);
+			if(puckCharac->fireActorComp->magazine > 0)
+			{
+				if(puckCharac->fireActorComp->bCanAttack)
+				{
+					AnimInstance->Montage_Play(puckCharac->FireShotgunAnim);
+				}
+			}
+			else
+			{
+				AnimInstance->Montage_Play(puckCharac->ReloadShotgunAnim);
+			}
+		}
 	}
+	
 }
 
 void UPuckWeaponComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)

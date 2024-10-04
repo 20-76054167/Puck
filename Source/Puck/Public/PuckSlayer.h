@@ -121,6 +121,14 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Weapon")
 	UPuckWeaponComponent* Shotgun;
 
+	class UFireActorComponent* fireActorComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="AnimMontage")
+	class UAnimMontage* FireShotgunAnim;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="AnimMontage")
+	class UAnimMontage* ReloadShotgunAnim;
+
 	//FVector MoveDirection;
 
 	int32 SlayerHealth;
