@@ -2,14 +2,19 @@
 
 
 #include "PuckWeaponComponent.h"
+
+#include <filesystem>
+
 #include "BFG_Projectile.h"
 #include "PuckSlayer.h"
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "FireActorComponent.h"
+#include "Components/Image.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Puck/Widgets/HUDUserWidget.h"
 
 UPuckWeaponComponent::UPuckWeaponComponent()
 {
@@ -134,7 +139,7 @@ void UPuckWeaponComponent::Fire()
 			else
 			{
 				AnimInstance->Montage_Play(puckCharac->ReloadShotgunAnim);
-			}
+			}  
 		}
 	}
 	

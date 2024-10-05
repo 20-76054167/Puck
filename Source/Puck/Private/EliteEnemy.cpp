@@ -2,7 +2,10 @@
 
 
 #include "EliteEnemy.h"
+
+#include "PuckSlayer.h"
 #include "Kismet/GameplayStatics.h"
+#include "Puck/ActorComponents/PlayerStatusComponent.h"
 
 // Sets default values
 AEliteEnemy::AEliteEnemy()
@@ -49,13 +52,13 @@ void AEliteEnemy::AttackPlayer()
 	//DrawDebugLine(GetWorld(), _Start, _End, FColor::Red, false, 10.0f);
 	DrawDebugSphere(GetWorld(), _HitOut.ImpactPoint, 10.0f, 12, FColor::Yellow, false, 2.f);
 
-	AActor* PlayerActor = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	auto* PlayerActor = Cast<APuckSlayer>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 	if (PlayerActor && isHit)
 	{
 
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("HitActor: %s"), *_HitOut.GetActor()->GetName()));
-		UGameplayStatics::ApplyDamage(PlayerActor, EliteDamageAmount, GetController(), this, UDamageType::StaticClass());
-		UE_LOG(LogTemp, Warning, TEXT("TakeDamage : %f"), EliteDamageAmount);
+		PlayerActor->PlayerStatusComponent->TakeDamage(EliteDamageAmount);
+		UE_LOG(LogTemp, Warning, TEXT("TakeDamage : %f"), PlayerActor->PlayerStatusComponent->CurrentHealth);
 	}
 }
 

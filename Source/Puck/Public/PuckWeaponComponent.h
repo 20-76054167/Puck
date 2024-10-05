@@ -46,6 +46,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category = "")
 	FName AttachedSocketName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
+	UTexture2D* WeaponIcon; 
 	
 private:
 	UPROPERTY()
