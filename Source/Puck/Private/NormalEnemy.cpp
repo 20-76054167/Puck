@@ -9,7 +9,7 @@ ANormalEnemy::ANormalEnemy()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	EnemyHealth = 100.0f;
+	EnemyHealth = 10.f;
 
 
 }
@@ -25,7 +25,6 @@ void ANormalEnemy::BeginPlay()
 void ANormalEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 	//EnemyFollowCharacter();
 
 }
@@ -86,8 +85,8 @@ void ANormalEnemy::AttackPlayer()
 	_TraceParams.AddIgnoredActor(this);
 	//GetWorld()->LineTraceSingleByChannel(_HitOut, _Start, _End, ECC_GameTraceChannel1, _TraceParams);
 	
-	bool isHit = GetWorld()->LineTraceSingleByChannel(_HitOut, _Start, _End, ECC_GameTraceChannel1, _TraceParams);
-	DrawDebugLine(GetWorld(), _Start, _End, FColor::Red, false, 10.0f);
+	bool isHit = GetWorld()->SweepSingleByChannel(_HitOut, _Start, _End, FQuat::Identity, ECC_GameTraceChannel1, FCollisionShape::MakeSphere(100.f), _TraceParams);
+	//DrawDebugLine(GetWorld(), _Start, _End, FColor::Red, false, 10.0f);
 	DrawDebugSphere(GetWorld(), _HitOut.ImpactPoint, 10.0f, 12, FColor::Yellow, false, 2.f);
 	
 	AActor* PlayerActor = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
