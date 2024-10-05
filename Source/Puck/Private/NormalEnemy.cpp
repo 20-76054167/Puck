@@ -85,7 +85,7 @@ void ANormalEnemy::AttackPlayer()
 	_TraceParams.AddIgnoredActor(this);
 	//GetWorld()->LineTraceSingleByChannel(_HitOut, _Start, _End, ECC_GameTraceChannel1, _TraceParams);
 	
-	bool isHit = GetWorld()->SweepSingleByChannel(_HitOut, _Start, _End, FQuat::Identity, ECC_GameTraceChannel1, FCollisionShape::MakeSphere(100.f), _TraceParams);
+	bool isHit = GetWorld()->SweepSingleByChannel(_HitOut, _Start, _End, FQuat::Identity, ECC_GameTraceChannel1, FCollisionShape::MakeSphere(200.f), _TraceParams);
 	//DrawDebugLine(GetWorld(), _Start, _End, FColor::Red, false, 10.0f);
 	DrawDebugSphere(GetWorld(), _HitOut.ImpactPoint, 10.0f, 12, FColor::Yellow, false, 2.f);
 	
