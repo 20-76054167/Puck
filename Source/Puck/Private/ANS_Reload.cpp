@@ -19,8 +19,8 @@ void UANS_Reload::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase*
 {
 	Super::NotifyEnd(MeshComp, Animation);
 
-	if(Player)
+	if(Player && Player->fireActorComp)
 	{
-		bool IsReload = Player->fireActorComp->Reload();
+		Player->fireActorComp->Reload();
 	}
 }

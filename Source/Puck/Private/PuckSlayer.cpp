@@ -110,6 +110,7 @@ void APuckSlayer::BeginPlay()
 		// 라이플을 먼저 장착했으니 라이플 상태로 설정
 		CurrentEwType = EWType::Rifle;
 		HUD->SetWeaponIcon(Rifle->WeaponIcon);
+		fireActorComp->ChangeActorMode(CurrentEwType);
 	}
 	if (bShotgun)
 		Shotgun->AttachWeapon(this);
@@ -278,6 +279,8 @@ void APuckSlayer::ChangeToShotgun(const FInputActionValue& Value)
 	
 	this->SetWidgetVisible(false, CurrentEwType);
 	if (SwapMontage) PlayAnimMontage(SwapMontage);
+	
+	fireActorComp->ChangeActorMode(EWType::Shotgun);
 }
 
 void APuckSlayer::ChangeToRifle(const FInputActionValue& Value)
@@ -291,6 +294,8 @@ void APuckSlayer::ChangeToRifle(const FInputActionValue& Value)
 	
 	this->SetWidgetVisible(false, CurrentEwType);
 	if (SwapMontage) PlayAnimMontage(SwapMontage);
+
+	fireActorComp->ChangeActorMode(EWType::Rifle);
 }
 
 void APuckSlayer::RunStart(const FInputActionValue& Value)
@@ -372,6 +377,65 @@ void APuckSlayer::SetWidgetVisible(bool bVisible,  EWType WeaponType)
 		break;
 	}
 }
+
+void APuckSlayer::PlayFireAnim()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if(AnimInstance)
+	{
+		int32 playerMagazine = fireActorComp->GetCurrentMagazine();
+		if(playerMagazine > 0)
+		{
+			if(fireActorComp->bCanAttack)
+			{
+				if(CurrentEwType == EWType::Shotgun)
+				{
+					if(bIsAiming)
+					{
+						AnimInstance->Montage_Play(ZoomFireShotgunAnim);
+					}
+					else
+					{
+						AnimInstance->Montage_Play(FireShotgunAnim);
+					}
+				}
+				else if(CurrentEwType == EWType::Rifle)
+				{
+					if(bIsAiming)
+					{
+						AnimInstance->Montage_Play(ZoomFireRifleAnim);
+					}
+					else
+					{
+						AnimInstance->Montage_Play(FireRifleAnim);
+					}
+				}
+			}
+		}
+		else
+		{
+			this->PlayReloadAnim();
+		}  
+	}
+}
+
+void APuckSlayer::PlayReloadAnim()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if(AnimInstance)
+	{
+		if(CurrentEwType == EWType::Shotgun)
+		{
+			AnimInstance->Montage_Play(ReloadShotgunAnim);	
+		}
+		else if(CurrentEwType == EWType::Rifle)
+		{
+			AnimInstance->Montage_Play(ReloadRifleAnim);
+		}
+	}
+}
+
+
 
 // player status component 에서 체력을 처리하기 때문에 주석 처리
 // float APuckSlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)

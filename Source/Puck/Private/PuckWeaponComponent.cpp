@@ -64,6 +64,7 @@ bool UPuckWeaponComponent::AttachWeapon(class APuckSlayer* TargetCharacter)
 		if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
 		{
 			EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &UPuckWeaponComponent::Fire);
+			EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Started, this, &UPuckWeaponComponent::Reload);
 		}
 	}
 	Character->OwingWeaponNum++;
@@ -72,7 +73,6 @@ bool UPuckWeaponComponent::AttachWeapon(class APuckSlayer* TargetCharacter)
 
 void UPuckWeaponComponent::Fire()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Fire"));
 	if (Character == nullptr || Character->GetController() == nullptr)
 	{
 		return;
@@ -123,26 +123,18 @@ void UPuckWeaponComponent::Fire()
 	APuckSlayer* puckCharac = Cast<APuckSlayer>(Character);
 	if (puckCharac != nullptr)
 	{
-		//puckCharac->fireActorComp->FireByTrace();
-		UAnimInstance* AnimInstance = puckCharac->GetMesh()->GetAnimInstance();
-		if(AnimInstance)
-		{
-			int32 testMana = puckCharac->fireActorComp->magazine;
-			UE_LOG(LogTemp, Warning, TEXT("%d"), testMana);
-			if(puckCharac->fireActorComp->magazine > 0)
-			{
-				if(puckCharac->fireActorComp->bCanAttack)
-				{
-					AnimInstance->Montage_Play(puckCharac->FireShotgunAnim);
-				}
-			}
-			else
-			{
-				AnimInstance->Montage_Play(puckCharac->ReloadShotgunAnim);
-			}  
-		}
+		puckCharac->PlayFireAnim();
 	}
 	
+}
+
+void UPuckWeaponComponent::Reload()
+{
+	APuckSlayer* puckCharac = Cast<APuckSlayer>(Character);
+	if (puckCharac != nullptr)
+	{
+		puckCharac->PlayReloadAnim();
+	}
 }
 
 void UPuckWeaponComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)

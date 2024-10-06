@@ -9,7 +9,7 @@
 void UAN_SetCanFire::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,
                             const FAnimNotifyEventReference& EventReference)
 {
-	Super::Notify(MeshComp, Animation, EventReference);
+	//Super::Notify(MeshComp, Animation, EventReference);
 
 	if(MeshComp->GetOwner())
 	{

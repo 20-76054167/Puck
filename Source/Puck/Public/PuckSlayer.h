@@ -133,9 +133,25 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="AnimMontage")
 	class UAnimMontage* FireShotgunAnim;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="AnimMontage")
+	class UAnimMontage* ZoomFireShotgunAnim;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="AnimMontage")
 	class UAnimMontage* ReloadShotgunAnim;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="AnimMontage")
+	class UAnimMontage* FireRifleAnim;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="AnimMontage")
+	class UAnimMontage* ZoomFireRifleAnim;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="AnimMontage")
+	class UAnimMontage* ReloadRifleAnim;
+
+	void PlayFireAnim();
+	void PlayReloadAnim();
+	FOnMontageEnded EndDelegate;
 
 	// player status component 에서 체력을 처리하기 때문에 주석 처리
 	// float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
