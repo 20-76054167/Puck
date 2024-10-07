@@ -17,6 +17,8 @@
 #include "FireActorComponent.h"
 #include "Puck/ActorComponents/PlayerStatusComponent.h"
 #include "Puck/Widgets/HUDUserWidget.h"
+#include "Sound/SoundBase.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 APuckSlayer::APuckSlayer()
@@ -218,6 +220,10 @@ void APuckSlayer::InputJump(const FInputActionValue& Value)
 
 void APuckSlayer::DashFunc(const FInputActionValue& Value)
 {
+	if (DashSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(),DashSound, GetActorLocation());
+	}
 	FVector Velocity = GetCharacterMovement()->Velocity;
 	Velocity.Z = 0.0;
 	Velocity.Normalize();
@@ -233,6 +239,7 @@ void APuckSlayer::DashFunc(const FInputActionValue& Value)
 	{
 		GetCharacterMovement()->BrakingFrictionFactor = 2.0f;
 	}), 0.5f, false);
+
 }
 
 void APuckSlayer::ZoomFunc(const FInputActionValue& Value)
