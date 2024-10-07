@@ -431,10 +431,28 @@ void APuckSlayer::PlayFireAnim()
 					if(bIsAiming)
 					{
 						AnimInstance->Montage_Play(ZoomFireRifleAnim);
+						if(RifleAimUI->IsVisible() && rifleZoomAnim)
+						{
+							RifleAimUI->PlayAnimation(rifleZoomAnim);
+						}
 					}
 					else
 					{
 						AnimInstance->Montage_Play(FireRifleAnim);
+					}
+				}
+			}
+			else
+			{
+				if(!AnimInstance->Montage_IsPlaying(ReloadShotgunAnim) && !AnimInstance->Montage_IsPlaying(ReloadRifleAnim))
+				{
+					if(!AnimInstance->Montage_IsPlaying(ZoomFireShotgunAnim) && !AnimInstance->Montage_IsPlaying(FireShotgunAnim))
+					{
+						if(!AnimInstance->Montage_IsPlaying(ZoomFireRifleAnim) && !AnimInstance->Montage_IsPlaying(FireRifleAnim))
+						{
+							fireActorComp->bCanAttack = true;
+							PlayFireAnim();
+						}
 					}
 				}
 			}
@@ -448,6 +466,11 @@ void APuckSlayer::PlayFireAnim()
 
 void APuckSlayer::PlayReloadAnim()
 {
+	if(fireActorComp->IsFullMagazine())
+	{
+		return;
+	}
+	
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if(AnimInstance)
 	{
@@ -466,6 +489,12 @@ void APuckSlayer::PlayReloadAnim()
 				AnimInstance->Montage_Play(ReloadRifleAnim);
 			}
 		}
+		
+		this->bIsAiming = false;
+		this->SetWidgetVisible(false, CurrentEwType);
+
+		TargetSpringArmLength = DefaultSpringArmLength;
+		TargetCameraRelativeLocation = DefaultCameraRelativeLocation;
 	}
 }
 

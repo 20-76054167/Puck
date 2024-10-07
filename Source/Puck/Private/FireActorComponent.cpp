@@ -8,7 +8,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "NormalEnemy.h "
+#include "NormalEnemy.h"
 #include "Particles/ParticleSystem.h"
 
 // Sets default values for this component's properties
@@ -36,11 +36,11 @@ UFireActorComponent::UFireActorComponent()
 	recoilEndCallback.BindUFunction(this, FName("RecoveryRecoil"));
 
 
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("/Script/Engine.ParticleSystem'/Game/ParagonGrux/FX/Particles/Skins/Grux_Beetle_Magma/P_Grux_Magma_Ultimate_Clang.P_Grux_Magma_Ultimate_Clang'")); // ½ÇÁ¦ ÆÄÆ¼Å¬ °æ·Î·Î ¼öÁ¤
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("/Script/Engine.ParticleSystem'/Game/ParagonGrux/FX/Particles/Skins/Grux_Beetle_Magma/P_Grux_Magma_Ultimate_Clang.P_Grux_Magma_Ultimate_Clang'")); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ¼Å¬ ï¿½ï¿½Î·ï¿½ ï¿½ï¿½ï¿½ï¿½
 
 	if (ParticleAsset.Succeeded())
 	{
-		particleEffect = ParticleAsset.Object; // ÆÄÆ¼Å¬ ÀÌÆåÆ®¸¦ º¯¼ö¿¡ ÇÒ´ç
+		particleEffect = ParticleAsset.Object; // ï¿½ï¿½Æ¼Å¬ ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ò´ï¿½
 	}
 }
 
@@ -109,8 +109,6 @@ void UFireActorComponent::FireByTrace()
 	
 	if(currentMode == EWType::Shotgun)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, TEXT("shotgun fire"));
-		
 		for(int i=0; i < bulletNum; i++)
 		{
 			FHitResult _hitRes;
@@ -132,7 +130,7 @@ void UFireActorComponent::FireByTrace()
 			}
 		
 			bool isHit = GetWorld()->LineTraceSingleByChannel(_hitRes, _startLoc, _endLoc, ECC_Pawn, _collisionParam);
-			//DrawDebugLine(GetWorld(), _startLoc, _endLoc, FColor::Green, true, 5.f);
+			DrawDebugLine(GetWorld(), _startLoc, _endLoc, FColor::Green, true, 5.f);
 		
 			if(isHit)
 			{
@@ -157,7 +155,6 @@ void UFireActorComponent::FireByTrace()
 	}
 	else if(currentMode == EWType::Rifle)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, TEXT("Rifle fire"));
 		FHitResult _hitRes;
 
 		FCollisionQueryParams _collisionParam;
@@ -169,11 +166,11 @@ void UFireActorComponent::FireByTrace()
 		if(bIsAiming)
 		{
 			_endLoc.X += pitchRandom;
-			_endLoc.Z += yawRandom;	
+			_endLoc.Z += yawRandom;
 		}
 		
 		bool isHit = GetWorld()->LineTraceSingleByChannel(_hitRes, _startLoc, _endLoc, ECC_Pawn, _collisionParam);
-		//DrawDebugLine(GetWorld(), _startLoc, _endLoc, FColor::Green, true, 5.f);
+		DrawDebugLine(GetWorld(), _startLoc, _endLoc, FColor::Green, true, 5.f);
 
 		if(IsValid(playerController))
 		{
@@ -277,5 +274,27 @@ void UFireActorComponent::RecoveryRecoil()
 	if(IsValid(playerController))
 	{
 		playerController->AddPitchInput(3);
+	}
+}
+
+bool UFireActorComponent::IsFullMagazine()
+{
+	int maxMagazine = 0;
+	if(currentMode == EWType::Shotgun)
+	{
+		maxMagazine = maxMagazineShotGun;
+	}
+	else if(currentMode == EWType::Rifle)
+	{
+		maxMagazine = maxMagazineRifle;
+	}
+
+	if(GetCurrentMagazine() >= maxMagazine)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
 	}
 }

@@ -51,4 +51,9 @@ public:
 
 private:
 	void Die();
+
+	UPROPERTY(EditAnywhere, Category = "Effects")
+	UParticleSystem* EparticleEffect; // 파티클 이펙트 변수
+
+	UParticleSystemComponent* particleComponent;
 };
