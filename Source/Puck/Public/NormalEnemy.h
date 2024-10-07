@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+
 #include "NormalEnemy.generated.h"
 
 UCLASS()
@@ -46,5 +47,8 @@ public:
 	UAnimMontage* attackAnimMontage;
 
 
+	float TakeDamage(float takenDamage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
+private:
+	void Die();
 };

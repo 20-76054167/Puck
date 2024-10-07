@@ -129,6 +129,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Weapon")
 	UPuckWeaponComponent* Shotgun;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UFireActorComponent* fireActorComp;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="AnimMontage")
@@ -151,12 +152,11 @@ public:
 
 	void PlayFireAnim();
 	void PlayReloadAnim();
-	FOnMontageEnded EndDelegate;
-
+	
 	// player status component 에서 체력을 처리하기 때문에 주석 처리
 	// float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
-private:
+public:
 	// 줌(우클릭) 하고 있는지를 추적하는 bool 변수
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "State", meta = (AllowPrivateAccess = "true"))
 	bool bIsAiming = false;
@@ -190,4 +190,18 @@ private:
 
 	// running
 	bool bIsRunning = false;
+
+public:
+	// Dash Cooldown Properties
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Dash")
+	float DashCooldownTime = 2.0f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dash")
+	bool bIsDashOnCooldown = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dash")
+	float DashRemainingTime = 0.0f;
+
+	// Function to reset dash cooldown
+	void ResetDashCooldown();
 };

@@ -22,5 +22,6 @@ void UANS_Reload::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase*
 	if(Player && Player->fireActorComp)
 	{
 		Player->fireActorComp->Reload();
+		Player->fireActorComp->bCanAttack = true;
 	}
 }

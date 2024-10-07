@@ -12,7 +12,7 @@ AEliteEnemy::AEliteEnemy()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	EliteEnemyHealth = 50.f;
+	EliteEnemyHealth = 100.f;
 }
 
 // Called when the game starts or when spawned
@@ -60,5 +60,25 @@ void AEliteEnemy::AttackPlayer()
 		PlayerActor->PlayerStatusComponent->TakeDamage(EliteDamageAmount);
 		UE_LOG(LogTemp, Warning, TEXT("TakeDamage : %f"), PlayerActor->PlayerStatusComponent->CurrentHealth);
 	}
+}
+
+float AEliteEnemy::TakeDamage(float takenDamage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+
+	EliteEnemyHealth -= takenDamage;
+	UE_LOG(LogTemp, Warning, TEXT("%s Remain Health : %f"), *this->GetName(), this->EliteEnemyHealth);
+
+	if (EliteEnemyHealth <= 0)
+	{
+		FTimerHandle deathTimer;
+		GetWorld()->GetTimerManager().SetTimer(deathTimer, this, &AEliteEnemy::Die, 2.0f, false);
+	}
+	return Super::TakeDamage(takenDamage, DamageEvent, EventInstigator, DamageCauser);
+
+}
+
+void AEliteEnemy::Die()
+{
+	Destroy();
 }
 
