@@ -141,7 +141,8 @@ void UFireActorComponent::FireByTrace()
 				{
 					UGameplayStatics::ApplyDamage(hitActor, damage, ownerPlayer->GetController(), ownerPlayer, UDamageType::StaticClass());
 
-					FVector actorLocation = hitActor->GetActorLocation();
+					//FVector actorLocation = hitActor->GetActorLocation();
+					FVector actorLocation = _hitRes.Location;
 
 					
 					if (particleEffect)
@@ -187,7 +188,8 @@ void UFireActorComponent::FireByTrace()
 			{
 				UGameplayStatics::ApplyDamage(hitActor, damage, ownerPlayer->GetController(), ownerPlayer, UDamageType::StaticClass());
 
-				FVector actorLocation = hitActor->GetActorLocation();
+				//FVector actorLocation = hitActor->GetActorLocation();
+				FVector actorLocation = _hitRes.Location;
 
 
 				if (particleEffect)
