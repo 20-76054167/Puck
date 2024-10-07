@@ -8,7 +8,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "NormalEnemy.h "
+#include "NormalEnemy.h"
 #include "Particles/ParticleSystem.h"
 
 // Sets default values for this component's properties
@@ -36,11 +36,11 @@ UFireActorComponent::UFireActorComponent()
 	recoilEndCallback.BindUFunction(this, FName("RecoveryRecoil"));
 
 
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("/Script/Engine.ParticleSystem'/Game/ParagonGrux/FX/Particles/Skins/Grux_Beetle_Magma/P_Grux_Magma_Ultimate_Clang.P_Grux_Magma_Ultimate_Clang'")); // ½ÇÁ¦ ÆÄÆ¼Å¬ °æ·Î·Î ¼öÁ¤
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("/Script/Engine.ParticleSystem'/Game/ParagonGrux/FX/Particles/Skins/Grux_Beetle_Magma/P_Grux_Magma_Ultimate_Clang.P_Grux_Magma_Ultimate_Clang'")); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ¼Å¬ ï¿½ï¿½Î·ï¿½ ï¿½ï¿½ï¿½ï¿½
 
 	if (ParticleAsset.Succeeded())
 	{
-		particleEffect = ParticleAsset.Object; // ÆÄÆ¼Å¬ ÀÌÆåÆ®¸¦ º¯¼ö¿¡ ÇÒ´ç
+		particleEffect = ParticleAsset.Object; // ï¿½ï¿½Æ¼Å¬ ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ò´ï¿½
 	}
 }
 

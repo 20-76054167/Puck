@@ -17,13 +17,16 @@ public:
 	UPuckWeaponComponent();
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category= "Projectile")
-	TSubclassOf<class ABFG_Projectile> BFG_ProjectileClass;
+	TSubclassOf<class ABFG_Projectile> ProjectileClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Sound")
-	USoundBase* BFG_FireSound;
+	USoundBase* FireSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Sound")
+	USoundBase* ReloadSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim Montage")
-	UAnimMontage* BFG_FireAnimation;
+	UAnimMontage* FireAnimation;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Gameplay")
 	FVector MuzzleOffset;
@@ -53,7 +56,7 @@ public:
 	void Reload();
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Projectile Damage")
-	float BFG_Damage;
+	float Damage;
 
 	UPROPERTY(VisibleAnywhere, Category = "")
 	FName AttachedSocketName;
