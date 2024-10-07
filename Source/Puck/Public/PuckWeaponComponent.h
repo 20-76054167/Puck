@@ -51,6 +51,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="Weapon")
 	void Fire();
+	
+	UFUNCTION(BlueprintCallable, Category="Weapon")
+	void FireTrace();
 
 	UFUNCTION(BlueprintCallable, Category="Weapon")
 	void Reload();
