@@ -421,14 +421,19 @@ void APuckSlayer::PlayFireAnim()
 			{
 				if(CurrentEwType == EWType::Shotgun)
 				{
-					GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, "Shotgun");
 					if(bIsAiming)
 					{
 						AnimInstance->Montage_Play(ZoomFireShotgunAnim);
+
+						blendOutDelegate.BindUObject(this, &APuckSlayer::MontageBlendOutEvent);
+						GetMesh()->GetAnimInstance()->Montage_SetBlendingOutDelegate(blendOutDelegate, ZoomFireShotgunAnim);
 					}
 					else
 					{
 						AnimInstance->Montage_Play(FireShotgunAnim);
+
+						blendOutDelegate.BindUObject(this, &APuckSlayer::MontageBlendOutEvent);
+						GetMesh()->GetAnimInstance()->Montage_SetBlendingOutDelegate(blendOutDelegate, FireShotgunAnim);
 					}
 					if(FireSound_Shotgun)
 					{
@@ -440,6 +445,10 @@ void APuckSlayer::PlayFireAnim()
 					if(bIsAiming)
 					{
 						AnimInstance->Montage_Play(ZoomFireRifleAnim);
+
+						blendOutDelegate.BindUObject(this, &APuckSlayer::MontageBlendOutEvent);
+						GetMesh()->GetAnimInstance()->Montage_SetBlendingOutDelegate(blendOutDelegate, ZoomFireRifleAnim);
+						
 						if(RifleAimUI->IsVisible() && rifleZoomAnim)
 						{
 							RifleAimUI->PlayAnimation(rifleZoomAnim);
@@ -448,6 +457,9 @@ void APuckSlayer::PlayFireAnim()
 					else
 					{
 						AnimInstance->Montage_Play(FireRifleAnim);
+
+						blendOutDelegate.BindUObject(this, &APuckSlayer::MontageBlendOutEvent);
+						GetMesh()->GetAnimInstance()->Montage_SetBlendingOutDelegate(blendOutDelegate, FireRifleAnim);
 					}
 					if(FireSound_Rifle)
 					{
@@ -478,7 +490,10 @@ void APuckSlayer::PlayReloadAnim()
 		{
 			if(!AnimInstance->Montage_IsPlaying(ReloadShotgunAnim))
 			{
-				AnimInstance->Montage_Play(ReloadShotgunAnim);	
+				AnimInstance->Montage_Play(ReloadShotgunAnim);
+
+				blendOutDelegate.BindUObject(this, &APuckSlayer::MontageBlendOutEvent);
+				GetMesh()->GetAnimInstance()->Montage_SetBlendingOutDelegate(blendOutDelegate, ReloadShotgunAnim);
 			}
 		}
 		else if(CurrentEwType == EWType::Rifle)
@@ -486,6 +501,9 @@ void APuckSlayer::PlayReloadAnim()
 			if(!AnimInstance->Montage_IsPlaying(ReloadRifleAnim))
 			{
 				AnimInstance->Montage_Play(ReloadRifleAnim);
+
+				blendOutDelegate.BindUObject(this, &APuckSlayer::MontageBlendOutEvent);
+				GetMesh()->GetAnimInstance()->Montage_SetBlendingOutDelegate(blendOutDelegate, ReloadRifleAnim);
 			}
 		}
 		
@@ -494,6 +512,14 @@ void APuckSlayer::PlayReloadAnim()
 
 		TargetSpringArmLength = DefaultSpringArmLength;
 		TargetCameraRelativeLocation = DefaultCameraRelativeLocation;
+	}
+}
+
+void APuckSlayer::MontageBlendOutEvent(class UAnimMontage* animMontage, bool bInterrupted)
+{
+	if(bInterrupted)
+	{
+		fireActorComp->bCanAttack = true;	
 	}
 }
 

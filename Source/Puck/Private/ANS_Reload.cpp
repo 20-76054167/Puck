@@ -8,27 +8,17 @@
 
 void UANS_Reload::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration)
 {
-	Super::NotifyBegin(MeshComp, Animation, TotalDuration);
+	//Super::NotifyBegin(MeshComp, Animation, TotalDuration);
 
 	if(MeshComp->GetOwner())
 	{
 		Player = Cast<APuckSlayer>(MeshComp->GetOwner());
-
-		if(Player->fireActorComp->IsFullMagazine())
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, "Reload Stop");
-			UAnimInstance* AnimInstance = MeshComp->GetAnimInstance();
-			if(AnimInstance)
-			{
-				AnimInstance->Montage_SetPosition(AnimInstance->GetCurrentActiveMontage(), 3.76);
-			}
-		}
 	}
 }
 
 void UANS_Reload::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
-	Super::NotifyEnd(MeshComp, Animation);
+	//Super::NotifyEnd(MeshComp, Animation);
 
 	if(Player && Player->fireActorComp)
 	{
@@ -37,5 +27,17 @@ void UANS_Reload::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase*
 		
 		// set HUD Magazine Value
 		Player->HUD->SetMagazine();
+		
+		if(Player->fireActorComp->IsFullMagazine())
+		{
+			UAnimInstance* AnimInstance = MeshComp->GetAnimInstance();
+			if(AnimInstance)
+			{
+				if(AnimInstance->Montage_IsPlaying(Player->ReloadShotgunAnim))
+				{
+					AnimInstance->Montage_SetPosition(Player->ReloadShotgunAnim, 3.76);
+				}
+			}
+		}
 	}
 }

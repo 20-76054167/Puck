@@ -137,7 +137,7 @@ float ANormalEnemy::TakeDamage(float takenDamage, FDamageEvent const& DamageEven
 
 void ANormalEnemy::Die()
 {
-	FVector newDieScale(6.0f, 6.0f, 6.0f);
+	FVector newDieScale(2.0f, 2.0f, 2.0f);
 	if (EDeathEffect)
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), EDeathEffect, GetActorLocation(), FRotator::ZeroRotator, newDieScale, true);
