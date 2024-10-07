@@ -5,9 +5,10 @@
 
 #include "FireActorComponent.h"
 #include "PuckSlayer.h"
+#include "Puck/Widgets/HUDUserWidget.h"
 
 void UAN_Fire::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,
-                          const FAnimNotifyEventReference& EventReference)
+                      const FAnimNotifyEventReference& EventReference)
 {
 	//Super::Notify(MeshComp, Animation, EventReference);
 	
@@ -22,5 +23,7 @@ void UAN_Fire::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Anima
 			currnetMagazine--;
 			PuckSlayer->fireActorComp->SetMagazine(currnetMagazine);
 		}
+		// set HUD Magazine Value
+		PuckSlayer->HUD->SetMagazine();
 	}
 }
