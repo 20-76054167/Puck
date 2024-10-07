@@ -212,4 +212,13 @@ public:
 
 	// Function to reset dash cooldown
 	void ResetDashCooldown();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SoundEffects")
+	class USoundBase* DashSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "SoundEffects")
+	USoundBase* FireSound_Shotgun;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "SoundEffects")
+	USoundBase* FireSound_Rifle;
 };

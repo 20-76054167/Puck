@@ -13,4 +13,9 @@ class APuckGameMode : public AGameModeBase
 
 public:
 	APuckGameMode();
+
+	virtual void BeginPlay() override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music")
+	USoundBase* BackGroundMusic_1;
 };

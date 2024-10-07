@@ -20,6 +20,14 @@ ANormalEnemy::ANormalEnemy()
 	{
 		EparticleEffect = ParticleAsset.Object; // 파티클 이펙트를 변수에 할당
 	}
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleDeathAsset(TEXT("/Script/Engine.ParticleSystem'/Game/ParagonGrux/FX/Particles/Skins/Grux_Beetle_Magma/P_Grux_Magma_Spawn.P_Grux_Magma_Spawn'")); // 실제 파티클 경로로 수정
+
+	if (ParticleDeathAsset.Succeeded())
+	{
+		EDeathEffect = ParticleDeathAsset.Object; // 파티클 이펙트를 변수에 할당
+	}
+
 }
 
 // Called when the game starts or when spawned
@@ -129,6 +137,11 @@ float ANormalEnemy::TakeDamage(float takenDamage, FDamageEvent const& DamageEven
 
 void ANormalEnemy::Die()
 {
+	FVector newDieScale(6.0f, 6.0f, 6.0f);
+	if (EDeathEffect)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), EDeathEffect, GetActorLocation(), FRotator::ZeroRotator, newDieScale, true);
+	}
 	Destroy();
 }
 

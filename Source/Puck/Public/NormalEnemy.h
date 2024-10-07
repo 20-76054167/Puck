@@ -56,4 +56,6 @@ private:
 	UParticleSystem* EparticleEffect; // 파티클 이펙트 변수
 
 	UParticleSystemComponent* particleComponent;
+
+	UParticleSystem* EDeathEffect; // 파티클 이펙트 변수
 };

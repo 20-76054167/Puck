@@ -191,7 +191,8 @@ void UFireActorComponent::FireByTrace()
 
 				if (particleEffect)
 				{
-					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), particleEffect, actorLocation, FRotator::ZeroRotator, true);
+					FVector newShootScale(0.4f, 0.4f, 0.4f);
+					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), particleEffect, actorLocation, FRotator::ZeroRotator, newShootScale, true);
 				}
 			}
 		}

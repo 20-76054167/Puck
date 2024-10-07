@@ -89,8 +89,13 @@ void ABFG_Projectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UP
 
 		// Niagara 이펙트 시스템을 특정 위치에 스폰
 		SpawnNiagaraEffectAtLocation(GetWorld(), HitNiagaraEffect, SpawnLocation, SpawnRotation, SpawnScale);
-		Destroy();
+		//GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABFG_Projectile::DelayDestroy, 1.0f, false);
 	}
+}
+
+void ABFG_Projectile::DelayDestroy()
+{
+	Destroy();
 }
 
 void ABFG_Projectile::SetDamage(float DamageAmount)
@@ -112,6 +117,8 @@ void ABFG_Projectile::CalculateVelocity()
 	ProjectileMovement->SetVelocityInLocalSpace(Velocity);
 	ProjectileMovement->Velocity = Velocity;
 }
+
+
 
 // Called every frame
 void ABFG_Projectile::Tick(float DeltaTime)

@@ -3,6 +3,8 @@
 #include "PuckGameMode.h"
 #include "PuckCharacter.h"
 #include "UObject/ConstructorHelpers.h"
+#include "Sound/SoundBase.h"
+#include "Kismet/GameplayStatics.h"
 
 APuckGameMode::APuckGameMode()
 {
@@ -13,4 +15,14 @@ APuckGameMode::APuckGameMode()
 	// 	UE_LOG(LogTemp, Warning, TEXT("APuckGameMode Class Initialized"));
 	// 	DefaultPawnClass = PlayerPawnBPClass.Class;
 	// }
+}
+
+void APuckGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (BackGroundMusic_1)
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), BackGroundMusic_1);
+	}
 }

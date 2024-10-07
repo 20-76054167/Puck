@@ -69,4 +69,10 @@ public:
 	float VelocityMultiplier = 150.0f;
 	float VelocityMinimum = 300.0f;
 	float ImpulseMultiplier = 700.0f;
+
+private:
+	FTimerHandle TimerHandle;
+
+	// 타이머에 의해 호출될 함수
+	void DelayDestroy();
 };

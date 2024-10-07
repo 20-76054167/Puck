@@ -21,7 +21,7 @@ UPuckWeaponComponent::UPuckWeaponComponent()
 	// Default offset from the character location for projectiles to spawn
 	MuzzleOffset = FVector(100.0f, 0.0f, 10.0f);
 	PrimaryComponentTick.bCanEverTick = true;
-	BFG_Damage = 100.f;
+	Damage = 100.f;
 }
 
 bool UPuckWeaponComponent::AttachWeapon(class APuckSlayer* TargetCharacter)
