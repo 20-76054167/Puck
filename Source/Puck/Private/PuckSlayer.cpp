@@ -408,6 +408,10 @@ void APuckSlayer::PlayFireAnim()
 					if(bIsAiming)
 					{
 						AnimInstance->Montage_Play(ZoomFireRifleAnim);
+						if(RifleAimUI->IsVisible() && rifleZoomAnim)
+						{
+							RifleAimUI->PlayAnimation(rifleZoomAnim);
+						}
 					}
 					else
 					{
@@ -443,6 +447,12 @@ void APuckSlayer::PlayReloadAnim()
 				AnimInstance->Montage_Play(ReloadRifleAnim);
 			}
 		}
+		
+		this->bIsAiming = false;
+		this->SetWidgetVisible(false, CurrentEwType);
+
+		TargetSpringArmLength = DefaultSpringArmLength;
+		TargetCameraRelativeLocation = DefaultCameraRelativeLocation;
 	}
 }
 
