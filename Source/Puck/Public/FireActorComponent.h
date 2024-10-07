@@ -17,7 +17,8 @@ class PUCK_API UFireActorComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UFireActorComponent();
-	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EWType currentMode;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="FireArrow")
@@ -30,13 +31,13 @@ public:
 	float range = 1000;
 
 	UPROPERTY(EditAnywhere, Category="bullet option")
-	float pitchCongestion = 100;
+	float pitchCongestion = 200;
 
 	UPROPERTY(EditAnywhere, Category="bullet option")
-	float rollCongestion = 100;
+	float rollCongestion = 200;
 
 	UPROPERTY(EditAnywhere, Category="bullet option")
-	float yawCongestion = 100;
+	float yawCongestion = 200;
 	
 	UPROPERTY(EditAnywhere, Category="bullet option")
 	int32 bulletNum = 6;
@@ -52,8 +53,12 @@ public:
 
 	UPROPERTY(EditAnywhere, Category="bullet option")
 	int32 magazineRifle = 6;
-	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bCanAttack = true;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bIsAiming = false;
 
 	APuckSlayer* ownerPlayer;
 	APlayerController* playerController;
