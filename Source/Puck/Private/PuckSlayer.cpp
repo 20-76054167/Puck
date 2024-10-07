@@ -416,6 +416,7 @@ void APuckSlayer::PlayFireAnim()
 			{
 				if(CurrentEwType == EWType::Shotgun)
 				{
+					GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, "Shotgun");
 					if(bIsAiming)
 					{
 						AnimInstance->Montage_Play(ZoomFireShotgunAnim);
@@ -438,20 +439,6 @@ void APuckSlayer::PlayFireAnim()
 					else
 					{
 						AnimInstance->Montage_Play(FireRifleAnim);
-					}
-				}
-			}
-			else
-			{
-				if(!AnimInstance->Montage_IsPlaying(ReloadShotgunAnim) && !AnimInstance->Montage_IsPlaying(ReloadRifleAnim))
-				{
-					if(!AnimInstance->Montage_IsPlaying(ZoomFireShotgunAnim) && !AnimInstance->Montage_IsPlaying(FireShotgunAnim))
-					{
-						if(!AnimInstance->Montage_IsPlaying(ZoomFireRifleAnim) && !AnimInstance->Montage_IsPlaying(FireRifleAnim))
-						{
-							fireActorComp->bCanAttack = true;
-							PlayFireAnim();
-						}
 					}
 				}
 			}

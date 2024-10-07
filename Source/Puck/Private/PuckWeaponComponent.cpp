@@ -64,7 +64,7 @@ bool UPuckWeaponComponent::AttachWeapon(class APuckSlayer* TargetCharacter)
 		if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
 		{
 			EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &UPuckWeaponComponent::Fire);
-			EnhancedInputComponent->BindAction(FireTraceAction, ETriggerEvent::Triggered, this, &UPuckWeaponComponent::Fire);
+			EnhancedInputComponent->BindAction(FireTraceAction, ETriggerEvent::Triggered, this, &UPuckWeaponComponent::FireTrace);
 			EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Started, this, &UPuckWeaponComponent::Reload);
 		}
 	}
@@ -122,11 +122,25 @@ void UPuckWeaponComponent::Fire()
 	}*/
 
 	APuckSlayer* puckCharac = Cast<APuckSlayer>(Character);
-	if (puckCharac != nullptr)
+	if (puckCharac != nullptr && puckCharac->CurrentEwType == EWType::Shotgun)
 	{
 		puckCharac->PlayFireAnim();
 	}
 	
+}
+
+void UPuckWeaponComponent::FireTrace()
+{
+	if (Character == nullptr || Character->GetController() == nullptr)
+	{
+		return;
+	}
+
+	APuckSlayer* puckCharac = Cast<APuckSlayer>(Character);
+	if (puckCharac != nullptr && puckCharac->CurrentEwType == EWType::Rifle)
+	{
+		puckCharac->PlayFireAnim();
+	}
 }
 
 void UPuckWeaponComponent::Reload()
