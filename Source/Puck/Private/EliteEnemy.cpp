@@ -87,7 +87,7 @@ float AEliteEnemy::TakeDamage(float takenDamage, FDamageEvent const& DamageEvent
 
 void AEliteEnemy::Die()
 {
-	FVector newDieScale(9.0f, 9.0f, 9.0f);
+	FVector newDieScale(5.0f, 5.0f, 5.0f);
 	if (EDeathEffect)
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), EDeathEffect, GetActorLocation(), FRotator::ZeroRotator, newDieScale, true);

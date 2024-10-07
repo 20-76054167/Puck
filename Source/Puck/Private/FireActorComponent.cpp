@@ -36,7 +36,7 @@ UFireActorComponent::UFireActorComponent()
 	recoilEndCallback.BindUFunction(this, FName("RecoveryRecoil"));
 
 
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("/Script/Engine.ParticleSystem'/Game/ParagonGrux/FX/Particles/Skins/Grux_Beetle_Magma/P_Grux_Magma_Ultimate_Clang.P_Grux_Magma_Ultimate_Clang'")); // ���� ��ƼŬ ��η� ����
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("/Script/Engine.ParticleSystem'/Game/ParagonMurdock/FX/Particles/Abilities/Primary/FX/P_PlasmaShot_Hit_World.P_PlasmaShot_Hit_World'")); // ���� ��ƼŬ ��η� ����
 
 	if (ParticleAsset.Succeeded())
 	{
@@ -145,7 +145,8 @@ void UFireActorComponent::FireByTrace()
 					
 					if (particleEffect)
 					{
-						UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), particleEffect, actorLocation, FRotator::ZeroRotator, true); 
+						FVector newShootScale(4.0f, 4.0f, 4.0f);
+						UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), particleEffect, actorLocation, FRotator::ZeroRotator, newShootScale, true);
 					}
 				}
 			}
@@ -191,7 +192,7 @@ void UFireActorComponent::FireByTrace()
 
 				if (particleEffect)
 				{
-					FVector newShootScale(0.4f, 0.4f, 0.4f);
+					FVector newShootScale(1.3f, 1.3f, 1.3f);
 					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), particleEffect, actorLocation, FRotator::ZeroRotator, newShootScale, true);
 				}
 			}
