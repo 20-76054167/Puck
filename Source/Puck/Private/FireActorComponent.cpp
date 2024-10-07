@@ -153,7 +153,7 @@ void UFireActorComponent::FireByTrace()
 			playerController->AddPitchInput(pitchRandom);
 		}
 		
-		GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(URecoilCameraShake::StaticClass());
+		GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(UCS_RifleRecoil::StaticClass());
 		
 		bool isHit = GetWorld()->LineTraceSingleByChannel(_hitRes, _startLoc, _endLoc, ECC_Pawn, _collisionParam);
 		DrawDebugLine(GetWorld(), _startLoc, _endLoc, FColor::Green, true, 5.f);

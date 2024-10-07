@@ -10,9 +10,11 @@
  * 
  */
 UCLASS()
-class PUCK_API URecoilCameraShake : public ULegacyCameraShake
+class PUCK_API UCS_RifleRecoil : public ULegacyCameraShake
 {
 	GENERATED_BODY()
+	
 public:
-	URecoilCameraShake();
+	UCS_RifleRecoil();
+	
 };

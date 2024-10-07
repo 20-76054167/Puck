@@ -3,7 +3,7 @@
 
 #include "CS_RifleRecoil.h"
 
-URecoilCameraShake::URecoilCameraShake()
+UCS_RifleRecoil::UCS_RifleRecoil()
 {
 	OscillationDuration = 0.2f;
 	OscillationBlendInTime = 0.1f;
