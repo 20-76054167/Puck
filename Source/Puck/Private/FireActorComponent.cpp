@@ -8,6 +8,8 @@
 #include "Camera/CameraComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "NormalEnemy.h "
+#include "Particles/ParticleSystem.h"
 
 // Sets default values for this component's properties
 UFireActorComponent::UFireActorComponent()
@@ -32,6 +34,14 @@ UFireActorComponent::UFireActorComponent()
 	recoilTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("Timeline Component"));
 	recoilStartCallback.BindUFunction(this, FName("RecoilStart"));
 	recoilEndCallback.BindUFunction(this, FName("RecoveryRecoil"));
+
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("/Script/Engine.ParticleSystem'/Game/ParagonGrux/FX/Particles/Skins/Grux_Beetle_Magma/P_Grux_Magma_Ultimate_Clang.P_Grux_Magma_Ultimate_Clang'")); // 실제 파티클 경로로 수정
+
+	if (ParticleAsset.Succeeded())
+	{
+		particleEffect = ParticleAsset.Object; // 파티클 이펙트를 변수에 할당
+	}
 }
 
 
@@ -65,7 +75,7 @@ void UFireActorComponent::BeginPlay()
 
 			for(UArrowComponent* singleArrow : ArrowComponents)
 			{
-				if(singleArrow->GetName() == "CameraVector")
+				if(singleArrow->GetName() == "FireArrowComp")
 				{
 					fireArrow = singleArrow;
 				}
@@ -100,6 +110,7 @@ void UFireActorComponent::FireByTrace()
 	if(currentMode == EWType::Shotgun)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, TEXT("shotgun fire"));
+		
 		for(int i=0; i < bulletNum; i++)
 		{
 			FHitResult _hitRes;
@@ -107,12 +118,21 @@ void UFireActorComponent::FireByTrace()
 			FCollisionQueryParams _collisionParam;
 			_collisionParam.AddIgnoredActor(ownerPlayer);
 
-			_endLoc.X += FMath::RandRange(pitchCongestion * -1, pitchCongestion);
-			_endLoc.Y += FMath::RandRange(rollCongestion * -1, rollCongestion);
-			_endLoc.Z += FMath::RandRange(yawCongestion * -1, yawCongestion);
+			if(bIsAiming)
+			{
+				_endLoc.X += FMath::RandRange((pitchCongestion * 0.5) * -1, (pitchCongestion * 0.5));
+				_endLoc.Y += FMath::RandRange((rollCongestion * 0.5) * -1, (rollCongestion * 0.5));
+				_endLoc.Z += FMath::RandRange((yawCongestion * 0.5) * -1, (yawCongestion * 0.5));	
+			}
+			else
+			{
+				_endLoc.X += FMath::RandRange(pitchCongestion * -1, pitchCongestion);
+				_endLoc.Y += FMath::RandRange(rollCongestion * -1, rollCongestion);
+				_endLoc.Z += FMath::RandRange(yawCongestion * -1, yawCongestion);
+			}
 		
 			bool isHit = GetWorld()->LineTraceSingleByChannel(_hitRes, _startLoc, _endLoc, ECC_Pawn, _collisionParam);
-			DrawDebugLine(GetWorld(), _startLoc, _endLoc, FColor::Green, true, 5.f);
+			//DrawDebugLine(GetWorld(), _startLoc, _endLoc, FColor::Green, true, 5.f);
 		
 			if(isHit)
 			{
@@ -120,6 +140,14 @@ void UFireActorComponent::FireByTrace()
 				if(hitActor)
 				{
 					UGameplayStatics::ApplyDamage(hitActor, damage, ownerPlayer->GetController(), ownerPlayer, UDamageType::StaticClass());
+
+					FVector actorLocation = hitActor->GetActorLocation();
+
+					
+					if (particleEffect)
+					{
+						UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), particleEffect, actorLocation, FRotator::ZeroRotator, true); 
+					}
 				}
 			}
 		}
@@ -133,15 +161,23 @@ void UFireActorComponent::FireByTrace()
 
 		FCollisionQueryParams _collisionParam;
 		_collisionParam.AddIgnoredActor(ownerPlayer);
+
+		float yawRandom = FMath::RandRange(-0.8, 0.8);
+		float pitchRandom = FMath::RandRange(-0.5, 0.0);
+
+		if(bIsAiming)
+		{
+			_endLoc.X += pitchRandom;
+			_endLoc.Z += yawRandom;	
+		}
 		
 		bool isHit = GetWorld()->LineTraceSingleByChannel(_hitRes, _startLoc, _endLoc, ECC_Pawn, _collisionParam);
-		DrawDebugLine(GetWorld(), _startLoc, _endLoc, FColor::Green, true, 5.f);
+		//DrawDebugLine(GetWorld(), _startLoc, _endLoc, FColor::Green, true, 5.f);
 
 		if(IsValid(playerController))
 		{
-			float yawRandom = FMath::RandRange(-1, 1);
 			playerController->AddYawInput(yawRandom);
-			playerController->AddPitchInput(-0.5);
+			playerController->AddPitchInput(pitchRandom);
 		}
 		
 		if(isHit)
@@ -150,6 +186,14 @@ void UFireActorComponent::FireByTrace()
 			if(hitActor)
 			{
 				UGameplayStatics::ApplyDamage(hitActor, damage, ownerPlayer->GetController(), ownerPlayer, UDamageType::StaticClass());
+
+				FVector actorLocation = hitActor->GetActorLocation();
+
+
+				if (particleEffect)
+				{
+					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), particleEffect, actorLocation, FRotator::ZeroRotator, true);
+				}
 			}
 		}
 	}
@@ -172,17 +216,17 @@ void UFireActorComponent::Reload()
 		{
 			return;
 		}
-		magazineRifle++;
+		magazineRifle = maxMagazineRifle;
 	}
 }
 
-void UFireActorComponent::SetMagazine(int32 plusMagazine)
+void UFireActorComponent::SetMagazine(int32 newMagazine)
 {
 	if(currentMode == EWType::Shotgun)
 	{
-		if(magazineShotGun+plusMagazine < maxMagazineShotGun)
+		if(newMagazine < maxMagazineShotGun)
 		{
-			magazineShotGun = plusMagazine;
+			magazineShotGun = newMagazine;
 		}
 		else
 		{
@@ -191,9 +235,9 @@ void UFireActorComponent::SetMagazine(int32 plusMagazine)
 	}
 	else if(currentMode == EWType::Rifle)
 	{
-		if(magazineRifle+plusMagazine < maxMagazineRifle)
+		if(newMagazine < maxMagazineRifle)
 		{
-			magazineRifle = plusMagazine;
+			magazineRifle = newMagazine;
 		}
 		else
 		{

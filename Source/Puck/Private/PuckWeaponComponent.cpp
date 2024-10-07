@@ -64,6 +64,7 @@ bool UPuckWeaponComponent::AttachWeapon(class APuckSlayer* TargetCharacter)
 		if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
 		{
 			EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &UPuckWeaponComponent::Fire);
+			EnhancedInputComponent->BindAction(FireTraceAction, ETriggerEvent::Triggered, this, &UPuckWeaponComponent::Fire);
 			EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Started, this, &UPuckWeaponComponent::Reload);
 		}
 	}

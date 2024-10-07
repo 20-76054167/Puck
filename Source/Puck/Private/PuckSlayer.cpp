@@ -17,8 +17,7 @@
 #include "FireActorComponent.h"
 #include "Puck/ActorComponents/PlayerStatusComponent.h"
 #include "Puck/Widgets/HUDUserWidget.h"
-#include "Sound/SoundBase.h"
-#include "Kismet/GameplayStatics.h"
+#include "Animation/AnimInstance.h"
 
 // Sets default values
 APuckSlayer::APuckSlayer()
@@ -147,6 +146,19 @@ void APuckSlayer::Tick(float DeltaTime)
 
 	FVector NewCameraRelativeLocation = FMath::VInterpTo(CameraComp->GetRelativeLocation(), TargetCameraRelativeLocation, DeltaTime, ZoomInterpSpeed);
 	CameraComp->SetRelativeLocation(NewCameraRelativeLocation);
+
+	if (bIsDashOnCooldown)
+	{
+		float TempDashRemainingTime = DashRemainingTime - DeltaTime;
+		if (TempDashRemainingTime < 0.0f)
+		{
+			ResetDashCooldown();
+		}
+		else
+		{
+			DashRemainingTime = TempDashRemainingTime;
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -220,10 +232,11 @@ void APuckSlayer::InputJump(const FInputActionValue& Value)
 
 void APuckSlayer::DashFunc(const FInputActionValue& Value)
 {
-	if (DashSound)
+	if (bIsDashOnCooldown)
 	{
-		UGameplayStatics::PlaySoundAtLocation(GetWorld(),DashSound, GetActorLocation());
+		return;
 	}
+	
 	FVector Velocity = GetCharacterMovement()->Velocity;
 	Velocity.Z = 0.0;
 	Velocity.Normalize();
@@ -240,6 +253,8 @@ void APuckSlayer::DashFunc(const FInputActionValue& Value)
 		GetCharacterMovement()->BrakingFrictionFactor = 2.0f;
 	}), 0.5f, false);
 
+	bIsDashOnCooldown = true;
+	DashRemainingTime = DashCooldownTime;
 }
 
 void APuckSlayer::ZoomFunc(const FInputActionValue& Value)
@@ -262,6 +277,8 @@ void APuckSlayer::ZoomFunc(const FInputActionValue& Value)
 	default:
 		break;
 	}
+
+	fireActorComp->bIsAiming = true;
 }
 
 void APuckSlayer::ZoomOutFunc(const FInputActionValue& Value)
@@ -273,6 +290,8 @@ void APuckSlayer::ZoomOutFunc(const FInputActionValue& Value)
 
 	TargetSpringArmLength = DefaultSpringArmLength;
 	TargetCameraRelativeLocation = DefaultCameraRelativeLocation;
+
+	fireActorComp->bIsAiming = false;
 }
 
 void APuckSlayer::ChangeToShotgun(const FInputActionValue& Value)
@@ -431,17 +450,29 @@ void APuckSlayer::PlayReloadAnim()
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if(AnimInstance)
 	{
+		fireActorComp->bCanAttack = false;
 		if(CurrentEwType == EWType::Shotgun)
 		{
-			AnimInstance->Montage_Play(ReloadShotgunAnim);	
+			if(!AnimInstance->Montage_IsPlaying(ReloadShotgunAnim))
+			{
+				AnimInstance->Montage_Play(ReloadShotgunAnim);	
+			}
 		}
 		else if(CurrentEwType == EWType::Rifle)
 		{
-			AnimInstance->Montage_Play(ReloadRifleAnim);
+			if(!AnimInstance->Montage_IsPlaying(ReloadRifleAnim))
+			{
+				AnimInstance->Montage_Play(ReloadRifleAnim);
+			}
 		}
 	}
 }
 
+void APuckSlayer::ResetDashCooldown()
+{
+	bIsDashOnCooldown = false;
+	DashRemainingTime = 0.0f;
+}
 
 
 // player status component 에서 체력을 처리하기 때문에 주석 처리

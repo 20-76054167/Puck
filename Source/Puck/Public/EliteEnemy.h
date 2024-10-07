@@ -37,5 +37,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "EnemyChaseAndAttack")
 	void AttackPlayer();
 
+	float TakeDamage(float takenDamage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+private:
+
+	void Die();
 	
 };
