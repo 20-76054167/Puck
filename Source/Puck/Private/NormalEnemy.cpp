@@ -11,7 +11,7 @@ ANormalEnemy::ANormalEnemy()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	EnemyHealth = 10.f;
+	EnemyHealth = 30.f;
 
 
 }
@@ -107,6 +107,7 @@ void ANormalEnemy::AttackPlayer()
 float ANormalEnemy::TakeDamage(float takenDamage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	EnemyHealth -= takenDamage;
+
 	UE_LOG(LogTemp, Warning, TEXT("%s Remain Health : %f"), *this->GetName(), this->EnemyHealth);
 	if (EnemyHealth <= 0)
 	{
