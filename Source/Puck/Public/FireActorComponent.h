@@ -90,6 +90,7 @@ public:
 	UFUNCTION()
 	void RecoveryRecoil();
 
+	bool IsFullMagazine();
 
 	UPROPERTY(EditAnywhere, Category = "Effects")
 	UParticleSystem* particleEffect; // 파티클 이펙트 변수

@@ -12,6 +12,16 @@ void UANS_Reload::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBas
 	if(MeshComp->GetOwner())
 	{
 		Player = Cast<APuckSlayer>(MeshComp->GetOwner());
+
+		if(Player->fireActorComp->IsFullMagazine())
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, "Reload Stop");
+			UAnimInstance* AnimInstance = MeshComp->GetAnimInstance();
+			if(AnimInstance)
+			{
+				AnimInstance->Montage_SetPosition(AnimInstance->GetCurrentActiveMontage(), 3.76);
+			}
+		}
 	}
 }
 

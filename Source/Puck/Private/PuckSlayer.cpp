@@ -441,6 +441,20 @@ void APuckSlayer::PlayFireAnim()
 					}
 				}
 			}
+			else
+			{
+				if(!AnimInstance->Montage_IsPlaying(ReloadShotgunAnim) && !AnimInstance->Montage_IsPlaying(ReloadRifleAnim))
+				{
+					if(!AnimInstance->Montage_IsPlaying(ZoomFireShotgunAnim) && !AnimInstance->Montage_IsPlaying(FireShotgunAnim))
+					{
+						if(!AnimInstance->Montage_IsPlaying(ZoomFireRifleAnim) && !AnimInstance->Montage_IsPlaying(FireRifleAnim))
+						{
+							fireActorComp->bCanAttack = true;
+							PlayFireAnim();
+						}
+					}
+				}
+			}
 		}
 		else
 		{
@@ -451,6 +465,11 @@ void APuckSlayer::PlayFireAnim()
 
 void APuckSlayer::PlayReloadAnim()
 {
+	if(fireActorComp->IsFullMagazine())
+	{
+		return;
+	}
+	
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if(AnimInstance)
 	{
