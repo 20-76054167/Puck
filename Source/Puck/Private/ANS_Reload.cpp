@@ -4,6 +4,7 @@
 #include "ANS_Reload.h"
 
 #include "FireActorComponent.h"
+#include "Puck/Widgets/HUDUserWidget.h"
 
 void UANS_Reload::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration)
 {
@@ -23,5 +24,8 @@ void UANS_Reload::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase*
 	{
 		Player->fireActorComp->Reload();
 		Player->fireActorComp->bCanAttack = true;
+		
+		// set HUD Magazine Value
+		Player->HUD->SetMagazine();
 	}
 }

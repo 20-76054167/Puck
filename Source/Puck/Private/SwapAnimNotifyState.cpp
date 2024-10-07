@@ -60,4 +60,7 @@ void USwapAnimNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequ
 		PuckSlayer->CurrentEwType = EWType::Rifle;
 		PuckSlayer->HUD->SetWeaponIcon(PuckSlayer->Rifle->WeaponIcon);
 	}
+		
+	// set HUD Magazine Value
+	PuckSlayer->HUD->SetMagazine();
 }

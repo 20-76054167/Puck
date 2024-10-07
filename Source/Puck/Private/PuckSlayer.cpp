@@ -132,7 +132,8 @@ void APuckSlayer::BeginPlay()
 	// bIsAiming 옵션의 기본 값이 false -> target = default
 	TargetSpringArmLength = DefaultSpringArmLength;
 	TargetCameraRelativeLocation = DefaultCameraRelativeLocation;
-	
+
+	HUD->SetMagazine();
 }
 
 // Called every frame
