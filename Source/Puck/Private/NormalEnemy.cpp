@@ -70,7 +70,7 @@ void ANormalEnemy::EnemyFollowCharacter()
 			FRotator NewRotation = RotateDirection.Rotation();
 			SetActorRotation(NewRotation);
 
-			if (DistanceToPlayer <= 200.0f)
+			if (DistanceToPlayer <= 200.0f )
 			{
 				AttackPlayer();
 			}
