@@ -132,6 +132,7 @@ void APuckSlayer::BeginPlay()
 	// bIsAiming 옵션의 기본 값이 false -> target = default
 	TargetSpringArmLength = DefaultSpringArmLength;
 	TargetCameraRelativeLocation = DefaultCameraRelativeLocation;
+	
 }
 
 // Called every frame
@@ -145,6 +146,19 @@ void APuckSlayer::Tick(float DeltaTime)
 
 	FVector NewCameraRelativeLocation = FMath::VInterpTo(CameraComp->GetRelativeLocation(), TargetCameraRelativeLocation, DeltaTime, ZoomInterpSpeed);
 	CameraComp->SetRelativeLocation(NewCameraRelativeLocation);
+
+	if (bIsDashOnCooldown)
+	{
+		float TempDashRemainingTime = DashRemainingTime - DeltaTime;
+		if (TempDashRemainingTime < 0.0f)
+		{
+			ResetDashCooldown();
+		}
+		else
+		{
+			DashRemainingTime = TempDashRemainingTime;
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -218,6 +232,11 @@ void APuckSlayer::InputJump(const FInputActionValue& Value)
 
 void APuckSlayer::DashFunc(const FInputActionValue& Value)
 {
+	if (bIsDashOnCooldown)
+	{
+		return;
+	}
+	
 	FVector Velocity = GetCharacterMovement()->Velocity;
 	Velocity.Z = 0.0;
 	Velocity.Normalize();
@@ -233,6 +252,9 @@ void APuckSlayer::DashFunc(const FInputActionValue& Value)
 	{
 		GetCharacterMovement()->BrakingFrictionFactor = 2.0f;
 	}), 0.5f, false);
+
+	bIsDashOnCooldown = true;
+	DashRemainingTime = DashCooldownTime;
 }
 
 void APuckSlayer::ZoomFunc(const FInputActionValue& Value)
@@ -445,6 +467,13 @@ void APuckSlayer::PlayReloadAnim()
 		}
 	}
 }
+
+void APuckSlayer::ResetDashCooldown()
+{
+	bIsDashOnCooldown = false;
+	DashRemainingTime = 0.0f;
+}
+
 
 // player status component 에서 체력을 처리하기 때문에 주석 처리
 // float APuckSlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
