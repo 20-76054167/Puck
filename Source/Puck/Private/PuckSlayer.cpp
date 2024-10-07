@@ -133,7 +133,8 @@ void APuckSlayer::BeginPlay()
 	// bIsAiming 옵션의 기본 값이 false -> target = default
 	TargetSpringArmLength = DefaultSpringArmLength;
 	TargetCameraRelativeLocation = DefaultCameraRelativeLocation;
-	
+
+	HUD->SetMagazine();
 }
 
 // Called every frame
@@ -438,6 +439,10 @@ void APuckSlayer::PlayFireAnim()
 					if(bIsAiming)
 					{
 						AnimInstance->Montage_Play(ZoomFireRifleAnim);
+						if(RifleAimUI->IsVisible() && rifleZoomAnim)
+						{
+							RifleAimUI->PlayAnimation(rifleZoomAnim);
+						}
 					}
 					else
 					{
@@ -446,6 +451,20 @@ void APuckSlayer::PlayFireAnim()
 					if(FireSound_Rifle)
 					{
 						UGameplayStatics::PlaySoundAtLocation(GetWorld(), FireSound_Rifle, GetActorLocation());
+					}
+				}
+			}
+			else
+			{
+				if(!AnimInstance->Montage_IsPlaying(ReloadShotgunAnim) && !AnimInstance->Montage_IsPlaying(ReloadRifleAnim))
+				{
+					if(!AnimInstance->Montage_IsPlaying(ZoomFireShotgunAnim) && !AnimInstance->Montage_IsPlaying(FireShotgunAnim))
+					{
+						if(!AnimInstance->Montage_IsPlaying(ZoomFireRifleAnim) && !AnimInstance->Montage_IsPlaying(FireRifleAnim))
+						{
+							fireActorComp->bCanAttack = true;
+							PlayFireAnim();
+						}
 					}
 				}
 			}
@@ -459,6 +478,11 @@ void APuckSlayer::PlayFireAnim()
 
 void APuckSlayer::PlayReloadAnim()
 {
+	if(fireActorComp->IsFullMagazine())
+	{
+		return;
+	}
+	
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if(AnimInstance)
 	{
@@ -477,6 +501,12 @@ void APuckSlayer::PlayReloadAnim()
 				AnimInstance->Montage_Play(ReloadRifleAnim);
 			}
 		}
+		
+		this->bIsAiming = false;
+		this->SetWidgetVisible(false, CurrentEwType);
+
+		TargetSpringArmLength = DefaultSpringArmLength;
+		TargetCameraRelativeLocation = DefaultCameraRelativeLocation;
 	}
 }
 

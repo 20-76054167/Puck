@@ -109,8 +109,6 @@ void UFireActorComponent::FireByTrace()
 	
 	if(currentMode == EWType::Shotgun)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, TEXT("shotgun fire"));
-		
 		for(int i=0; i < bulletNum; i++)
 		{
 			FHitResult _hitRes;
@@ -132,7 +130,7 @@ void UFireActorComponent::FireByTrace()
 			}
 		
 			bool isHit = GetWorld()->LineTraceSingleByChannel(_hitRes, _startLoc, _endLoc, ECC_Pawn, _collisionParam);
-			//DrawDebugLine(GetWorld(), _startLoc, _endLoc, FColor::Green, true, 5.f);
+			DrawDebugLine(GetWorld(), _startLoc, _endLoc, FColor::Green, true, 5.f);
 		
 			if(isHit)
 			{
@@ -141,7 +139,8 @@ void UFireActorComponent::FireByTrace()
 				{
 					UGameplayStatics::ApplyDamage(hitActor, damage, ownerPlayer->GetController(), ownerPlayer, UDamageType::StaticClass());
 
-					FVector actorLocation = hitActor->GetActorLocation();
+					//FVector actorLocation = hitActor->GetActorLocation();
+					FVector actorLocation = _hitRes.Location;
 
 					
 					if (particleEffect)
@@ -156,7 +155,6 @@ void UFireActorComponent::FireByTrace()
 	}
 	else if(currentMode == EWType::Rifle)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, TEXT("Rifle fire"));
 		FHitResult _hitRes;
 
 		FCollisionQueryParams _collisionParam;
@@ -168,11 +166,11 @@ void UFireActorComponent::FireByTrace()
 		if(bIsAiming)
 		{
 			_endLoc.X += pitchRandom;
-			_endLoc.Z += yawRandom;	
+			_endLoc.Z += yawRandom;
 		}
 		
 		bool isHit = GetWorld()->LineTraceSingleByChannel(_hitRes, _startLoc, _endLoc, ECC_Pawn, _collisionParam);
-		//DrawDebugLine(GetWorld(), _startLoc, _endLoc, FColor::Green, true, 5.f);
+		DrawDebugLine(GetWorld(), _startLoc, _endLoc, FColor::Green, true, 5.f);
 
 		if(IsValid(playerController))
 		{
@@ -187,7 +185,8 @@ void UFireActorComponent::FireByTrace()
 			{
 				UGameplayStatics::ApplyDamage(hitActor, damage, ownerPlayer->GetController(), ownerPlayer, UDamageType::StaticClass());
 
-				FVector actorLocation = hitActor->GetActorLocation();
+				//FVector actorLocation = hitActor->GetActorLocation();
+				FVector actorLocation = _hitRes.Location;
 
 
 				if (particleEffect)
@@ -275,5 +274,27 @@ void UFireActorComponent::RecoveryRecoil()
 	if(IsValid(playerController))
 	{
 		playerController->AddPitchInput(3);
+	}
+}
+
+bool UFireActorComponent::IsFullMagazine()
+{
+	int maxMagazine = 0;
+	if(currentMode == EWType::Shotgun)
+	{
+		maxMagazine = maxMagazineShotGun;
+	}
+	else if(currentMode == EWType::Rifle)
+	{
+		maxMagazine = maxMagazineRifle;
+	}
+
+	if(GetCurrentMagazine() >= maxMagazine)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
 	}
 }

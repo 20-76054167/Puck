@@ -91,6 +91,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	class APLauncher* PLauncher;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Widget")
+	class UWidgetAnimation* rifleZoomAnim;
+
 	UPROPERTY(EditAnywhere, Category="Widget")
 	TSubclassOf<class UUserWidget> NormalAimUIFactory;
 	class UUserWidget* NormalAimUI;
