@@ -42,5 +42,5 @@ public:
 private:
 
 	void Die();
-	
+	UParticleSystem* EDeathEffect; // 파티클 이펙트 변수
 };
