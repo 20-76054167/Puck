@@ -109,6 +109,11 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Widget")
 	TSubclassOf<class UHUDUserWidget> HUDFactory;
 	class UHUDUserWidget* HUD;
+
+	// Hit Indicator
+	UPROPERTY(EditAnywhere, Category = "Widget")
+	TSubclassOf<class UHitIndicator> HitIndicatorFactory;
+	class UHitIndicator* HitIndicator;
 	
 	UPROPERTY(EditAnywhere, Category="Widget")
 	float ZoomInFloat = 50.0f;
@@ -221,4 +226,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "SoundEffects")
 	USoundBase* FireSound_Rifle;
+
+	UFUNCTION()
+	void HandleDamageTakenWithLocation(FVector EnemyLocation);
+
+private:
+	FTimerHandle HitIndicatorTimerHandle;
 };

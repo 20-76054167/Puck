@@ -15,11 +15,11 @@ AEliteEnemy::AEliteEnemy()
 	PrimaryActorTick.bCanEverTick = true;
 	EliteEnemyHealth = 100.f;
 
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleDeathAsset(TEXT("/Script/Engine.ParticleSystem'/Game/ParagonGrux/FX/Particles/Skins/Grux_Beetle_Magma/P_Grux_Magma_Spawn.P_Grux_Magma_Spawn'")); // ½ÇÁ¦ ÆÄÆ¼Å¬ °æ·Î·Î ¼öÁ¤
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleDeathAsset(TEXT("/Script/Engine.ParticleSystem'/Game/ParagonGrux/FX/Particles/Skins/Grux_Beetle_Magma/P_Grux_Magma_Spawn.P_Grux_Magma_Spawn'")); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ¼Å¬ ï¿½ï¿½Î·ï¿½ ï¿½ï¿½ï¿½ï¿½
 
 	if (ParticleDeathAsset.Succeeded())
 	{
-		EDeathEffect = ParticleDeathAsset.Object; // ÆÄÆ¼Å¬ ÀÌÆåÆ®¸¦ º¯¼ö¿¡ ÇÒ´ç
+		EDeathEffect = ParticleDeathAsset.Object; // ï¿½ï¿½Æ¼Å¬ ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ò´ï¿½
 	}
 }
 
@@ -65,7 +65,7 @@ void AEliteEnemy::AttackPlayer()
 	{
 
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("HitActor: %s"), *_HitOut.GetActor()->GetName()));
-		PlayerActor->PlayerStatusComponent->TakeDamage(EliteDamageAmount);
+		PlayerActor->PlayerStatusComponent->TakeDamage(EliteDamageAmount, _Start);
 		UE_LOG(LogTemp, Warning, TEXT("TakeDamage : %f"), PlayerActor->PlayerStatusComponent->CurrentHealth);
 	}
 }

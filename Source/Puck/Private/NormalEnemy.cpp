@@ -115,7 +115,7 @@ void ANormalEnemy::AttackPlayer()
 		}
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("HitActor: %s"), *_HitOut.GetActor()->GetName()));
 		// UGameplayStatics::ApplyDamage(PlayerActor, DamageAmount, GetController(), this, UDamageType::StaticClass());
-		PlayerActor->PlayerStatusComponent->TakeDamage(DamageAmount);
+		PlayerActor->PlayerStatusComponent->TakeDamage(DamageAmount, _Start);
 		UE_LOG(LogTemp, Warning, TEXT("TakeDamage : %f"), PlayerActor->PlayerStatusComponent->CurrentHealth);
 	}
 
