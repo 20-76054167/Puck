@@ -155,6 +155,11 @@ public:
 
 	void PlayFireAnim();
 	void PlayReloadAnim();
+
+	FOnMontageEnded blendOutDelegate;
+
+	UFUNCTION()
+	void MontageBlendOutEvent(class UAnimMontage* animMontage, bool bInterrupted);
 	
 	// player status component 에서 체력을 처리하기 때문에 주석 처리
 	// float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;

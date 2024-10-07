@@ -8,7 +8,7 @@
 
 void UANS_Reload::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration)
 {
-	Super::NotifyBegin(MeshComp, Animation, TotalDuration);
+	//Super::NotifyBegin(MeshComp, Animation, TotalDuration);
 
 	if(MeshComp->GetOwner())
 	{
@@ -16,7 +16,6 @@ void UANS_Reload::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBas
 
 		if(Player->fireActorComp->IsFullMagazine())
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, "Reload Stop");
 			UAnimInstance* AnimInstance = MeshComp->GetAnimInstance();
 			if(AnimInstance)
 			{
@@ -28,7 +27,7 @@ void UANS_Reload::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBas
 
 void UANS_Reload::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
-	Super::NotifyEnd(MeshComp, Animation);
+	//Super::NotifyEnd(MeshComp, Animation);
 
 	if(Player && Player->fireActorComp)
 	{
