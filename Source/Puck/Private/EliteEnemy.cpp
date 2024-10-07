@@ -62,3 +62,23 @@ void AEliteEnemy::AttackPlayer()
 	}
 }
 
+float AEliteEnemy::TakeDamage(float takenDamage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+
+	EliteEnemyHealth -= takenDamage;
+	UE_LOG(LogTemp, Warning, TEXT("%s Remain Health : %f"), *this->GetName(), this->EliteEnemyHealth);
+
+	if (EliteEnemyHealth <= 0)
+	{
+		FTimerHandle deathTimer;
+		GetWorld()->GetTimerManager().SetTimer(deathTimer, this, &AEliteEnemy::Die, 2.0f, false);
+	}
+	return Super::TakeDamage(takenDamage, DamageEvent, EventInstigator, DamageCauser);
+
+}
+
+void AEliteEnemy::Die()
+{
+	Destroy();
+}
+

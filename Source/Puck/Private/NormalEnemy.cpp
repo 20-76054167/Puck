@@ -2,7 +2,6 @@
 
 
 #include "NormalEnemy.h"
-
 #include "PuckSlayer.h"
 #include "Kismet/GameplayStatics.h"
 #include "Puck/ActorComponents/PlayerStatusComponent.h"
@@ -104,4 +103,24 @@ void ANormalEnemy::AttackPlayer()
 
 
 }
+
+float ANormalEnemy::TakeDamage(float takenDamage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	EnemyHealth -= takenDamage;
+	UE_LOG(LogTemp, Warning, TEXT("%s Remain Health : %f"), *this->GetName(), this->EnemyHealth);
+	if (EnemyHealth <= 0)
+	{
+		FTimerHandle deathTimer;
+		GetWorld()->GetTimerManager().SetTimer(deathTimer, this, &ANormalEnemy::Die, 2.0f, false);
+	}
+	return Super::TakeDamage(takenDamage, DamageEvent, EventInstigator, DamageCauser);
+}
+
+void ANormalEnemy::Die()
+{
+	Destroy();
+}
+
+
+
 
