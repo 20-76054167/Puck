@@ -89,4 +89,10 @@ public:
 	void RecoilStart(float value);
 	UFUNCTION()
 	void RecoveryRecoil();
+
+
+	UPROPERTY(EditAnywhere, Category = "Effects")
+	UParticleSystem* particleEffect; // 파티클 이펙트 변수
+
+	UParticleSystemComponent* particleComponent;
 };

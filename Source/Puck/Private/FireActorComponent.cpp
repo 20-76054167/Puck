@@ -8,6 +8,8 @@
 #include "Camera/CameraComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "NormalEnemy.h "
+#include "Particles/ParticleSystem.h"
 
 // Sets default values for this component's properties
 UFireActorComponent::UFireActorComponent()
@@ -32,6 +34,14 @@ UFireActorComponent::UFireActorComponent()
 	recoilTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("Timeline Component"));
 	recoilStartCallback.BindUFunction(this, FName("RecoilStart"));
 	recoilEndCallback.BindUFunction(this, FName("RecoveryRecoil"));
+
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("/Script/Engine.ParticleSystem'/Game/ParagonGrux/FX/Particles/Skins/Grux_Beetle_Magma/P_Grux_Magma_Ultimate_Clang.P_Grux_Magma_Ultimate_Clang'")); // 실제 파티클 경로로 수정
+
+	if (ParticleAsset.Succeeded())
+	{
+		particleEffect = ParticleAsset.Object; // 파티클 이펙트를 변수에 할당
+	}
 }
 
 
@@ -128,6 +138,15 @@ void UFireActorComponent::FireByTrace()
 				if(hitActor)
 				{
 					UGameplayStatics::ApplyDamage(hitActor, damage, ownerPlayer->GetController(), ownerPlayer, UDamageType::StaticClass());
+
+					//FVector actorLocation = hitActor->GetActorLocation();
+					FVector actorLocation = _hitRes.Location;
+
+					
+					if (particleEffect)
+					{
+						UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), particleEffect, actorLocation, FRotator::ZeroRotator, true); 
+					}
 				}
 			}
 		}
@@ -165,6 +184,15 @@ void UFireActorComponent::FireByTrace()
 			if(hitActor)
 			{
 				UGameplayStatics::ApplyDamage(hitActor, damage, ownerPlayer->GetController(), ownerPlayer, UDamageType::StaticClass());
+
+				//FVector actorLocation = hitActor->GetActorLocation();
+				FVector actorLocation = _hitRes.Location;
+
+
+				if (particleEffect)
+				{
+					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), particleEffect, actorLocation, FRotator::ZeroRotator, true);
+				}
 			}
 		}
 	}

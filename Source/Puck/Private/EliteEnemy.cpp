@@ -12,7 +12,7 @@ AEliteEnemy::AEliteEnemy()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	EliteEnemyHealth = 50.f;
+	EliteEnemyHealth = 100.f;
 }
 
 // Called when the game starts or when spawned
