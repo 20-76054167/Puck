@@ -419,6 +419,9 @@ void APuckSlayer::PlayFireAnim()
 		{
 			if(fireActorComp->bCanAttack)
 			{
+				FVector SocketLocation;
+				FRotator SocketRotation;
+				
 				if(CurrentEwType == EWType::Shotgun)
 				{
 					if(bIsAiming)
@@ -435,10 +438,14 @@ void APuckSlayer::PlayFireAnim()
 						blendOutDelegate.BindUObject(this, &APuckSlayer::MontageBlendOutEvent);
 						GetMesh()->GetAnimInstance()->Montage_SetBlendingOutDelegate(blendOutDelegate, FireShotgunAnim);
 					}
+					
 					if(FireSound_Shotgun)
 					{
 						UGameplayStatics::PlaySoundAtLocation(GetWorld(), FireSound_Shotgun, GetActorLocation());
 					}
+
+					Shotgun->GetSocketWorldLocationAndRotation("Muzzle", SocketLocation, SocketRotation);
+					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Shotgun->MuzzleParticle, SocketLocation, SocketRotation);
 				}
 				else if(CurrentEwType == EWType::Rifle)
 				{
@@ -461,11 +468,17 @@ void APuckSlayer::PlayFireAnim()
 						blendOutDelegate.BindUObject(this, &APuckSlayer::MontageBlendOutEvent);
 						GetMesh()->GetAnimInstance()->Montage_SetBlendingOutDelegate(blendOutDelegate, FireRifleAnim);
 					}
+					
 					if(FireSound_Rifle)
 					{
 						UGameplayStatics::PlaySoundAtLocation(GetWorld(), FireSound_Rifle, GetActorLocation());
 					}
+
+					Rifle->GetSocketWorldLocationAndRotation("Muzzle", SocketLocation, SocketRotation);
+					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Rifle->MuzzleParticle, SocketLocation, SocketRotation);
 				}
+				
+				
 			}
 		}
 		else
