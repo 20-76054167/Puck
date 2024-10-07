@@ -5,6 +5,7 @@
 
 #include "PuckSlayer.h"
 #include "Kismet/GameplayStatics.h"
+#include "Particles/ParticleSystem.h"
 #include "Puck/ActorComponents/PlayerStatusComponent.h"
 
 // Sets default values
@@ -13,6 +14,13 @@ AEliteEnemy::AEliteEnemy()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	EliteEnemyHealth = 100.f;
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleDeathAsset(TEXT("/Script/Engine.ParticleSystem'/Game/ParagonGrux/FX/Particles/Skins/Grux_Beetle_Magma/P_Grux_Magma_Spawn.P_Grux_Magma_Spawn'")); // 실제 파티클 경로로 수정
+
+	if (ParticleDeathAsset.Succeeded())
+	{
+		EDeathEffect = ParticleDeathAsset.Object; // 파티클 이펙트를 변수에 할당
+	}
 }
 
 // Called when the game starts or when spawned
@@ -79,6 +87,11 @@ float AEliteEnemy::TakeDamage(float takenDamage, FDamageEvent const& DamageEvent
 
 void AEliteEnemy::Die()
 {
+	FVector newDieScale(9.0f, 9.0f, 9.0f);
+	if (EDeathEffect)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), EDeathEffect, GetActorLocation(), FRotator::ZeroRotator, newDieScale, true);
+	}
 	Destroy();
 }
 
