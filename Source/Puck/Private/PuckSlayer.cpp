@@ -17,6 +17,7 @@
 #include "FireActorComponent.h"
 #include "Puck/ActorComponents/PlayerStatusComponent.h"
 #include "Puck/Widgets/HUDUserWidget.h"
+#include "Animation/AnimInstance.h"
 
 // Sets default values
 APuckSlayer::APuckSlayer()
@@ -131,7 +132,6 @@ void APuckSlayer::BeginPlay()
 	// bIsAiming 옵션의 기본 값이 false -> target = default
 	TargetSpringArmLength = DefaultSpringArmLength;
 	TargetCameraRelativeLocation = DefaultCameraRelativeLocation;
-	
 }
 
 // Called every frame
@@ -255,6 +255,8 @@ void APuckSlayer::ZoomFunc(const FInputActionValue& Value)
 	default:
 		break;
 	}
+
+	fireActorComp->bIsAiming = true;
 }
 
 void APuckSlayer::ZoomOutFunc(const FInputActionValue& Value)
@@ -266,6 +268,8 @@ void APuckSlayer::ZoomOutFunc(const FInputActionValue& Value)
 
 	TargetSpringArmLength = DefaultSpringArmLength;
 	TargetCameraRelativeLocation = DefaultCameraRelativeLocation;
+
+	fireActorComp->bIsAiming = false;
 }
 
 void APuckSlayer::ChangeToShotgun(const FInputActionValue& Value)
@@ -424,18 +428,23 @@ void APuckSlayer::PlayReloadAnim()
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if(AnimInstance)
 	{
+		fireActorComp->bCanAttack = false;
 		if(CurrentEwType == EWType::Shotgun)
 		{
-			AnimInstance->Montage_Play(ReloadShotgunAnim);	
+			if(!AnimInstance->Montage_IsPlaying(ReloadShotgunAnim))
+			{
+				AnimInstance->Montage_Play(ReloadShotgunAnim);	
+			}
 		}
 		else if(CurrentEwType == EWType::Rifle)
 		{
-			AnimInstance->Montage_Play(ReloadRifleAnim);
+			if(!AnimInstance->Montage_IsPlaying(ReloadRifleAnim))
+			{
+				AnimInstance->Montage_Play(ReloadRifleAnim);
+			}
 		}
 	}
 }
-
-
 
 // player status component 에서 체력을 처리하기 때문에 주석 처리
 // float APuckSlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)

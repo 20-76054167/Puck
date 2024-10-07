@@ -129,6 +129,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Weapon")
 	UPuckWeaponComponent* Shotgun;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UFireActorComponent* fireActorComp;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="AnimMontage")
@@ -151,8 +152,7 @@ public:
 
 	void PlayFireAnim();
 	void PlayReloadAnim();
-	FOnMontageEnded EndDelegate;
-
+	
 	// player status component 에서 체력을 처리하기 때문에 주석 처리
 	// float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
