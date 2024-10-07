@@ -146,7 +146,7 @@ void UFireActorComponent::FireByTrace()
 					
 					if (particleEffect)
 					{
-					     UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), particleEffect, actorLocation, FRotator::ZeroRotator, true);
+						UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), particleEffect, actorLocation, FRotator::ZeroRotator, true); 
 					}
 				}
 			}
