@@ -29,7 +29,7 @@ public:
 
 
 
-	UPROPERTY(EditAnywhere, Category = "NormalEnemy Status")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NormalEnemy Status")
 	float EnemyHealth;
 
 	UPROPERTY(EditAnywhere, Category = "NormalEnemy Status")

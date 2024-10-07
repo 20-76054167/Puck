@@ -5,6 +5,7 @@
 
 #include <string>
 
+#include "Camera/CameraComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -19,15 +20,6 @@ UFireActorComponent::UFireActorComponent()
 	if(GetOwner())
 	{
 		ownerPlayer = Cast<APuckSlayer>(GetOwner());
-		if(ownerPlayer)
-		{
-			fireArrow = CreateDefaultSubobject<UArrowComponent>("Fire Arrow Component");
-			//fireArrow->AttachToComponent(ownerPlayer->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("spine_01"));
-			fireArrow->CreationMethod = EComponentCreationMethod::Instance;
-			fireArrow->RegisterComponent();
-			fireArrow->SetRelativeLocation(FVector(0, 50, 100));
-			fireArrow->SetRelativeRotation(FRotator(0, 0, 90));
-		}
 	}
 
 	ConstructorHelpers::FObjectFinder<UCurveFloat> curve(TEXT("/Script/Engine.CurveFloat'/Game/FireRecoilCurve.FireRecoilCurve'"));
@@ -39,6 +31,7 @@ UFireActorComponent::UFireActorComponent()
 
 	recoilTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("Timeline Component"));
 	recoilStartCallback.BindUFunction(this, FName("RecoilStart"));
+	recoilEndCallback.BindUFunction(this, FName("RecoveryRecoil"));
 }
 
 
@@ -47,6 +40,7 @@ void UFireActorComponent::SetRecoilTimeline()
 	if(recoilCurve)
 	{
 		recoilTimeline->AddInterpFloat(recoilCurve, recoilStartCallback);
+		recoilTimeline->SetTimelineFinishedFunc(recoilEndCallback);
 		recoilTimeline->SetLooping(false);
 	}
 }
@@ -56,14 +50,28 @@ void UFireActorComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
+	// ..
 	SetRecoilTimeline();
-
+	
 	AController* ownerController = ownerPlayer->GetController();
 	if(ownerController)
 	{
 		playerController = Cast<APlayerController>(ownerController);
-	}	
+		
+		if(ownerPlayer)
+		{
+			TArray<UArrowComponent*> ArrowComponents;
+			ownerPlayer->GetComponents<UArrowComponent>(ArrowComponents);
+
+			for(UArrowComponent* singleArrow : ArrowComponents)
+			{
+				if(singleArrow->GetName() == "CameraVector")
+				{
+					fireArrow = singleArrow;
+				}
+			}
+		}
+	}
 }
 
 // Called every frame
@@ -72,7 +80,11 @@ void UFireActorComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
-	magazine = maxMagazine;
+}
+
+void UFireActorComponent::ChangeActorMode(EWType changeMode)
+{
+	currentMode = changeMode;
 }
 
 void UFireActorComponent::FireByTrace()
@@ -81,33 +93,56 @@ void UFireActorComponent::FireByTrace()
 	{
 		return;
 	}
-
-	ownerPlayer = Cast<APuckSlayer>(GetOwner());
-	fireArrow = ownerPlayer->GetArrowComponent();
 	
-	for(int i=0; i < bulletNum; i++)
+	FVector _startLoc = fireArrow->GetComponentLocation();
+	FVector _endLoc = _startLoc + fireArrow->GetForwardVector() * range;
+	
+	if(currentMode == EWType::Shotgun)
 	{
-		FVector _startLoc = fireArrow->GetComponentLocation();
-		FVector _endLoc = _startLoc + fireArrow->GetForwardVector() * range;
+		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, TEXT("shotgun fire"));
+		for(int i=0; i < bulletNum; i++)
+		{
+			FHitResult _hitRes;
 
-		//FVector _startLoc = ownerPlayer->GetActorLocation();
-		//FVector _endLoc = _startLoc + ownerPlayer->GetActorForwardVector() * range;
+			FCollisionQueryParams _collisionParam;
+			_collisionParam.AddIgnoredActor(ownerPlayer);
 
+			_endLoc.X += FMath::RandRange(pitchCongestion * -1, pitchCongestion);
+			_endLoc.Y += FMath::RandRange(rollCongestion * -1, rollCongestion);
+			_endLoc.Z += FMath::RandRange(yawCongestion * -1, yawCongestion);
+		
+			bool isHit = GetWorld()->LineTraceSingleByChannel(_hitRes, _startLoc, _endLoc, ECC_Pawn, _collisionParam);
+			DrawDebugLine(GetWorld(), _startLoc, _endLoc, FColor::Green, true, 5.f);
+		
+			if(isHit)
+			{
+				AActor* hitActor = _hitRes.GetActor();
+				if(hitActor)
+				{
+					UGameplayStatics::ApplyDamage(hitActor, damage, ownerPlayer->GetController(), ownerPlayer, UDamageType::StaticClass());
+				}
+			}
+		}
+	
+		recoilTimeline->PlayFromStart();
+	}
+	else if(currentMode == EWType::Rifle)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, TEXT("Rifle fire"));
 		FHitResult _hitRes;
 
 		FCollisionQueryParams _collisionParam;
 		_collisionParam.AddIgnoredActor(ownerPlayer);
-
-		pitchRange = FMath::RandRange(-100, 100);
-		rollRange = FMath::RandRange(-100, 100);
-		yawRange = FMath::RandRange(-100, 100);
-
-		_endLoc.X += pitchRange;
-		_endLoc.Y += rollRange;
-		_endLoc.Z += yawRange;
 		
 		bool isHit = GetWorld()->LineTraceSingleByChannel(_hitRes, _startLoc, _endLoc, ECC_Pawn, _collisionParam);
 		DrawDebugLine(GetWorld(), _startLoc, _endLoc, FColor::Green, true, 5.f);
+
+		if(IsValid(playerController))
+		{
+			float yawRandom = FMath::RandRange(-1, 1);
+			playerController->AddYawInput(yawRandom);
+			playerController->AddPitchInput(-0.5);
+		}
 		
 		if(isHit)
 		{
@@ -119,36 +154,69 @@ void UFireActorComponent::FireByTrace()
 		}
 	}
 	
-	recoilTimeline->PlayFromStart();
 }
 
-bool UFireActorComponent::Reload()
+void UFireActorComponent::Reload()
 {
-	if(magazine >= maxMagazine)
+	if(currentMode == EWType::Shotgun)
 	{
-		return false;
-	}
-	magazine++;
-	
-	return true;
-}
-
-/*void UFireActorComponent::AttackRecoil()
-{
-	//AController* ownerController = GetOwner()->GetInstigatorController();
-	AController* ownerController = ownerPlayer->GetController();
-	
-	if(ownerController)
-	{
-		APlayerController* playerController = Cast<APlayerController>(ownerController);
-		if(playerController)
+		if(magazineShotGun >= maxMagazineShotGun)
 		{
-			playerController->AddPitchInput(-5.0f);
+			return;
+		}
+		magazineShotGun++;
+	}
+	else if(currentMode == EWType::Rifle)
+	{
+		if(magazineRifle >= maxMagazineRifle)
+		{
+			return;
+		}
+		magazineRifle++;
+	}
+}
+
+void UFireActorComponent::SetMagazine(int32 plusMagazine)
+{
+	if(currentMode == EWType::Shotgun)
+	{
+		if(magazineShotGun+plusMagazine < maxMagazineShotGun)
+		{
+			magazineShotGun = plusMagazine;
+		}
+		else
+		{
+			magazineShotGun = maxMagazineShotGun;
 		}
 	}
-	
-	this->RecoveryRecoil();
-}*/
+	else if(currentMode == EWType::Rifle)
+	{
+		if(magazineRifle+plusMagazine < maxMagazineRifle)
+		{
+			magazineRifle = plusMagazine;
+		}
+		else
+		{
+			magazineRifle = maxMagazineRifle;
+		}
+	}
+}
+
+int32 UFireActorComponent::GetCurrentMagazine()
+{
+	if(currentMode == EWType::Shotgun)
+	{
+		return magazineShotGun;
+	}
+	else if(currentMode == EWType::Rifle)
+	{
+		return magazineRifle;
+	}
+	else
+	{
+		return 1;
+	}
+}
 
 void UFireActorComponent::RecoilStart(float value)
 {
@@ -160,5 +228,8 @@ void UFireActorComponent::RecoilStart(float value)
 
 void UFireActorComponent::RecoveryRecoil()
 {
-	
+	if(IsValid(playerController))
+	{
+		playerController->AddPitchInput(3);
+	}
 }

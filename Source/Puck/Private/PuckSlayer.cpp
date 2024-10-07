@@ -15,15 +15,14 @@
 #include "GameFramework/Actor.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "FireActorComponent.h"
+#include "Puck/ActorComponents/PlayerStatusComponent.h"
+#include "Puck/Widgets/HUDUserWidget.h"
 
 // Sets default values
 APuckSlayer::APuckSlayer()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-
-	SlayerHealth = 100;
 
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	SpringArmComp->SetupAttachment(RootComponent);
@@ -45,6 +44,10 @@ APuckSlayer::APuckSlayer()
 	Shotgun = CreateDefaultSubobject<UPuckWeaponComponent>(TEXT("Shotgun"));
 
 	fireActorComp = CreateDefaultSubobject<UFireActorComponent>(TEXT("FireActorComp"));
+
+	// Player Status Component
+	PlayerStatusComponent = CreateDefaultSubobject<UPlayerStatusComponent>(TEXT("PlayerStatusComponent"));
+	
 }
 
 // Called when the game starts or when spawned
@@ -89,6 +92,16 @@ void APuckSlayer::BeginPlay()
 			NormalAimUI->AddToViewport();
 		}
 	}
+
+	// HUD
+	if (IsValid(HUDFactory))
+	{
+		if (HUD == nullptr)
+		{
+			HUD = Cast<UHUDUserWidget>(CreateWidget(GetWorld(), HUDFactory));
+			HUD->AddToViewport();
+		}
+	}
 	
 	// Rifle, Shotgun Equipment
 	if (bRifle)
@@ -96,6 +109,8 @@ void APuckSlayer::BeginPlay()
 		Rifle->AttachWeapon(this);
 		// 라이플을 먼저 장착했으니 라이플 상태로 설정
 		CurrentEwType = EWType::Rifle;
+		HUD->SetWeaponIcon(Rifle->WeaponIcon);
+		fireActorComp->ChangeActorMode(CurrentEwType);
 	}
 	if (bShotgun)
 		Shotgun->AttachWeapon(this);
@@ -264,6 +279,8 @@ void APuckSlayer::ChangeToShotgun(const FInputActionValue& Value)
 	
 	this->SetWidgetVisible(false, CurrentEwType);
 	if (SwapMontage) PlayAnimMontage(SwapMontage);
+	
+	fireActorComp->ChangeActorMode(EWType::Shotgun);
 }
 
 void APuckSlayer::ChangeToRifle(const FInputActionValue& Value)
@@ -277,6 +294,8 @@ void APuckSlayer::ChangeToRifle(const FInputActionValue& Value)
 	
 	this->SetWidgetVisible(false, CurrentEwType);
 	if (SwapMontage) PlayAnimMontage(SwapMontage);
+
+	fireActorComp->ChangeActorMode(EWType::Rifle);
 }
 
 void APuckSlayer::RunStart(const FInputActionValue& Value)
@@ -359,14 +378,74 @@ void APuckSlayer::SetWidgetVisible(bool bVisible,  EWType WeaponType)
 	}
 }
 
-float APuckSlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+void APuckSlayer::PlayFireAnim()
 {
-	SlayerHealth -= DamageAmount;
-
-	UE_LOG(LogTemp, Warning, TEXT("Current_SlayerHealth : %d"), SlayerHealth);
-	if (SlayerHealth <= 0.0f)
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if(AnimInstance)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Slayer Die!!!!!"));
+		int32 playerMagazine = fireActorComp->GetCurrentMagazine();
+		if(playerMagazine > 0)
+		{
+			if(fireActorComp->bCanAttack)
+			{
+				if(CurrentEwType == EWType::Shotgun)
+				{
+					if(bIsAiming)
+					{
+						AnimInstance->Montage_Play(ZoomFireShotgunAnim);
+					}
+					else
+					{
+						AnimInstance->Montage_Play(FireShotgunAnim);
+					}
+				}
+				else if(CurrentEwType == EWType::Rifle)
+				{
+					if(bIsAiming)
+					{
+						AnimInstance->Montage_Play(ZoomFireRifleAnim);
+					}
+					else
+					{
+						AnimInstance->Montage_Play(FireRifleAnim);
+					}
+				}
+			}
+		}
+		else
+		{
+			this->PlayReloadAnim();
+		}  
 	}
-	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
+
+void APuckSlayer::PlayReloadAnim()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if(AnimInstance)
+	{
+		if(CurrentEwType == EWType::Shotgun)
+		{
+			AnimInstance->Montage_Play(ReloadShotgunAnim);	
+		}
+		else if(CurrentEwType == EWType::Rifle)
+		{
+			AnimInstance->Montage_Play(ReloadRifleAnim);
+		}
+	}
+}
+
+
+
+// player status component 에서 체력을 처리하기 때문에 주석 처리
+// float APuckSlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+// {
+// 	SlayerHealth -= DamageAmount;
+//
+// 	UE_LOG(LogTemp, Warning, TEXT("Current_SlayerHealth : %d"), SlayerHealth);
+// 	if (SlayerHealth <= 0.0f)
+// 	{
+// 		UE_LOG(LogTemp, Warning, TEXT("Slayer Die!!!!!"));
+// 	}
+// 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+// }

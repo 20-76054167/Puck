@@ -6,6 +6,7 @@
 #include "PuckSlayer.h"
 #include "PuckWeaponComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Puck/Widgets/HUDUserWidget.h"
 
 void USwapAnimNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,
                                        float TotalDuration, const FAnimNotifyEventReference& EventReference)
@@ -52,9 +53,11 @@ void USwapAnimNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequ
 	if (PuckSlayer->CurrentEwType == EWType::Rifle)
 	{
 		PuckSlayer->CurrentEwType = EWType::Shotgun;
+		PuckSlayer->HUD->SetWeaponIcon(PuckSlayer->Shotgun->WeaponIcon);
 	}
 	else
 	{
 		PuckSlayer->CurrentEwType = EWType::Rifle;
+		PuckSlayer->HUD->SetWeaponIcon(PuckSlayer->Rifle->WeaponIcon);
 	}
 }

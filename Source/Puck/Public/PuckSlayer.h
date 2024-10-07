@@ -61,6 +61,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* ExecutionIA;
 
+	// Player Status Component
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ActorComponent")
+	class UPlayerStatusComponent* PlayerStatusComponent;
+
 
 	UPROPERTY(EditAnywhere, Category = "Fire")
 	TSubclassOf<class APBullet> Magazine;
@@ -98,6 +102,10 @@ public:
 	UPROPERTY(EditAnywhere, Category="Widget")
 	TSubclassOf<class UUserWidget> ShotgunAimUIFactory;
 	class UUserWidget* ShotgunAimUI;
+
+	UPROPERTY(EditAnywhere, Category = "Widget")
+	TSubclassOf<class UHUDUserWidget> HUDFactory;
+	class UHUDUserWidget* HUD;
 	
 	UPROPERTY(EditAnywhere, Category="Widget")
 	float ZoomInFloat = 50.0f;
@@ -125,15 +133,28 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="AnimMontage")
 	class UAnimMontage* FireShotgunAnim;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="AnimMontage")
+	class UAnimMontage* ZoomFireShotgunAnim;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="AnimMontage")
 	class UAnimMontage* ReloadShotgunAnim;
 
-	//FVector MoveDirection;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="AnimMontage")
+	class UAnimMontage* FireRifleAnim;
 
-	int32 SlayerHealth;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="AnimMontage")
+	class UAnimMontage* ZoomFireRifleAnim;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="AnimMontage")
+	class UAnimMontage* ReloadRifleAnim;
 
-	float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	void PlayFireAnim();
+	void PlayReloadAnim();
+	FOnMontageEnded EndDelegate;
+
+	// player status component 에서 체력을 처리하기 때문에 주석 처리
+	// float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 private:
 	// 줌(우클릭) 하고 있는지를 추적하는 bool 변수
@@ -169,6 +190,4 @@ private:
 
 	// running
 	bool bIsRunning = false;
-	
-	
 };

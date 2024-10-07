@@ -10,7 +10,7 @@
  * 
  */
 UCLASS()
-class PUCK_API UFireShotgun : public UAnimNotify
+class PUCK_API UAN_Fire : public UAnimNotify
 {
 	GENERATED_BODY()
 

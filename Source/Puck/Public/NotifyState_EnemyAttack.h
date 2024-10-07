@@ -27,4 +27,5 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Enemy")
 	ANormalEnemy* normalEnemy;
 
+	
 };

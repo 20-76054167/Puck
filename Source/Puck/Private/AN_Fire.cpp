@@ -6,18 +6,21 @@
 #include "FireActorComponent.h"
 #include "PuckSlayer.h"
 
-void UFireShotgun::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,
+void UAN_Fire::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,
                           const FAnimNotifyEventReference& EventReference)
 {
-	Super::Notify(MeshComp, Animation, EventReference);
+	//Super::Notify(MeshComp, Animation, EventReference);
 	
 	if(MeshComp->GetOwner())
 	{
 		APuckSlayer* PuckSlayer = Cast<APuckSlayer>(MeshComp->GetOwner());
 		if(PuckSlayer)
 		{
+			int32 currnetMagazine = PuckSlayer->fireActorComp->GetCurrentMagazine(); 
 			PuckSlayer->fireActorComp->FireByTrace();
 			PuckSlayer->fireActorComp->bCanAttack = false;
+			currnetMagazine--;
+			PuckSlayer->fireActorComp->SetMagazine(currnetMagazine);
 		}
 	}
 }

@@ -34,6 +34,10 @@ public:
 	/** Fire Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	class UInputAction* FireAction;
+
+	/* Reload Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	class UInputAction* ReloadAction;
 	
 	UFUNCTION(BlueprintCallable, Category="Weapon")
 	bool AttachWeapon(class APuckSlayer* TargetCharacter);
@@ -41,11 +45,17 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Weapon")
 	void Fire();
 
+	UFUNCTION(BlueprintCallable, Category="Weapon")
+	void Reload();
+
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Projectile Damage")
 	float BFG_Damage;
 
 	UPROPERTY(VisibleAnywhere, Category = "")
 	FName AttachedSocketName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
+	UTexture2D* WeaponIcon; 
 	
 private:
 	UPROPERTY()

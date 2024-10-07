@@ -2,14 +2,17 @@
 
 
 #include "NormalEnemy.h"
+
+#include "PuckSlayer.h"
 #include "Kismet/GameplayStatics.h"
+#include "Puck/ActorComponents/PlayerStatusComponent.h"
 
 // Sets default values
 ANormalEnemy::ANormalEnemy()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	EnemyHealth = 100.0f;
+	EnemyHealth = 10.f;
 
 
 }
@@ -25,7 +28,6 @@ void ANormalEnemy::BeginPlay()
 void ANormalEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 	//EnemyFollowCharacter();
 
 }
@@ -50,7 +52,7 @@ void ANormalEnemy::EnemyFollowCharacter()
 
 			float DistanceToPlayer = FVector::Dist(PlayerLocation, ThisEnemyLoaction);
 			
-			//ÀûÀÌ ÇÃ·¹ÀÌ¾î ¹Ù¶óº¸±â
+			//ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½Ù¶óº¸±ï¿½
 			FVector RotateDirection = PlayerLocation - ThisEnemyLoaction;
 			FRotator NewRotation = RotateDirection.Rotation();
 			SetActorRotation(NewRotation);
@@ -86,17 +88,18 @@ void ANormalEnemy::AttackPlayer()
 	_TraceParams.AddIgnoredActor(this);
 	//GetWorld()->LineTraceSingleByChannel(_HitOut, _Start, _End, ECC_GameTraceChannel1, _TraceParams);
 	
-	bool isHit = GetWorld()->LineTraceSingleByChannel(_HitOut, _Start, _End, ECC_GameTraceChannel1, _TraceParams);
-	DrawDebugLine(GetWorld(), _Start, _End, FColor::Red, false, 10.0f);
+	bool isHit = GetWorld()->SweepSingleByChannel(_HitOut, _Start, _End, FQuat::Identity, ECC_GameTraceChannel1, FCollisionShape::MakeSphere(200.f), _TraceParams);
+	//DrawDebugLine(GetWorld(), _Start, _End, FColor::Red, false, 10.0f);
 	DrawDebugSphere(GetWorld(), _HitOut.ImpactPoint, 10.0f, 12, FColor::Yellow, false, 2.f);
 	
-	AActor* PlayerActor = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	auto* PlayerActor = Cast<APuckSlayer>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 	if (PlayerActor && isHit)
 	{
 		
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("HitActor: %s"), *_HitOut.GetActor()->GetName()));
-		UGameplayStatics::ApplyDamage(PlayerActor, DamageAmount, GetController(), this, UDamageType::StaticClass());
-		UE_LOG(LogTemp, Warning, TEXT("TakeDamage : %f"), DamageAmount);
+		// UGameplayStatics::ApplyDamage(PlayerActor, DamageAmount, GetController(), this, UDamageType::StaticClass());
+		PlayerActor->PlayerStatusComponent->TakeDamage(DamageAmount);
+		UE_LOG(LogTemp, Warning, TEXT("TakeDamage : %f"), PlayerActor->PlayerStatusComponent->CurrentHealth);
 	}
 
 

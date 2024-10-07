@@ -6,6 +6,7 @@
 #include "PuckSlayer.h"
 #include "Components/ActorComponent.h"
 #include "Components/TimelineComponent.h"
+#include "EWType.h"
 #include "FireActorComponent.generated.h"
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable)
@@ -16,6 +17,8 @@ class PUCK_API UFireActorComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UFireActorComponent();
+	
+	EWType currentMode;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="FireArrow")
 	class UArrowComponent* fireArrow;
@@ -27,24 +30,28 @@ public:
 	float range = 1000;
 
 	UPROPERTY(EditAnywhere, Category="bullet option")
-	float pitchRange;
+	float pitchCongestion = 100;
 
 	UPROPERTY(EditAnywhere, Category="bullet option")
-	float rollRange;
+	float rollCongestion = 100;
 
 	UPROPERTY(EditAnywhere, Category="bullet option")
-	float yawRange;
+	float yawCongestion = 100;
 	
 	UPROPERTY(EditAnywhere, Category="bullet option")
 	int32 bulletNum = 6;
 	
 	UPROPERTY(EditAnywhere, Category="bullet option")
-	int32 maxMagazine = 2;
+	int32 maxMagazineShotGun = 5;
 
 	UPROPERTY(EditAnywhere, Category="bullet option")
-	int32 magazine;
+	int32 magazineShotGun = 2;
 
-	float attackDelay;
+	UPROPERTY(EditAnywhere, Category="bullet option")
+	int32 maxMagazineRifle = 10;
+
+	UPROPERTY(EditAnywhere, Category="bullet option")
+	int32 magazineRifle = 6;
 	
 	bool bCanAttack = true;
 
@@ -54,6 +61,7 @@ public:
 	UCurveFloat* recoilCurve;
 	class UTimelineComponent* recoilTimeline;
 	FOnTimelineFloat recoilStartCallback;
+	FOnTimelineEvent recoilEndCallback;
 	
 protected:
 	// Called when the game starts
@@ -62,15 +70,18 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	void ChangeActorMode(EWType currentMode);
+	void SetRecoilTimeline();
 	
 	void FireByTrace();
-	
-	bool Reload();
+	void Reload();
 
-	void SetRecoilTimeline();
+	void SetMagazine(int32 magazine);
+	int32 GetCurrentMagazine();
 
 	UFUNCTION()
 	void RecoilStart(float value);
-	
+	UFUNCTION()
 	void RecoveryRecoil();
 };
