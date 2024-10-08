@@ -15,11 +15,11 @@ AEliteEnemy::AEliteEnemy()
 	PrimaryActorTick.bCanEverTick = true;
 	EliteEnemyHealth = 100.f;
 
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleDeathAsset(TEXT("/Script/Engine.ParticleSystem'/Game/ParagonGrux/FX/Particles/Skins/Grux_Beetle_Magma/P_Grux_Magma_Spawn.P_Grux_Magma_Spawn'")); // ½ÇÁ¦ ÆÄÆ¼Å¬ °æ·Î·Î ¼öÁ¤
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleDeathAsset(TEXT("/Script/Engine.ParticleSystem'/Game/ParagonGrux/FX/Particles/Skins/Grux_Beetle_Magma/P_Grux_Magma_Spawn.P_Grux_Magma_Spawn'")); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ¼Å¬ ï¿½ï¿½Î·ï¿½ ï¿½ï¿½ï¿½ï¿½
 
 	if (ParticleDeathAsset.Succeeded())
 	{
-		EDeathEffect = ParticleDeathAsset.Object; // ÆÄÆ¼Å¬ ÀÌÆåÆ®¸¦ º¯¼ö¿¡ ÇÒ´ç
+		EDeathEffect = ParticleDeathAsset.Object; // ï¿½ï¿½Æ¼Å¬ ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ò´ï¿½
 	}
 }
 
@@ -91,6 +91,10 @@ void AEliteEnemy::Die()
 	if (EDeathEffect)
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), EDeathEffect, GetActorLocation(), FRotator::ZeroRotator, newDieScale, true);
+	}
+	if(PoofSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), PoofSound, GetActorLocation());
 	}
 	Destroy();
 }
