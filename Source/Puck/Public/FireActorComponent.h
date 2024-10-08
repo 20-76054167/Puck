@@ -63,11 +63,6 @@ public:
 	APuckSlayer* ownerPlayer;
 	APlayerController* playerController;
 	
-	UCurveFloat* recoilCurve;
-	class UTimelineComponent* recoilTimeline;
-	FOnTimelineFloat recoilStartCallback;
-	FOnTimelineEvent recoilEndCallback;
-	
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -77,18 +72,12 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void ChangeActorMode(EWType currentMode);
-	void SetRecoilTimeline();
 	
 	void FireByTrace();
 	void Reload();
 
 	void SetMagazine(int32 magazine);
 	int32 GetCurrentMagazine();
-
-	UFUNCTION()
-	void RecoilStart(float value);
-	UFUNCTION()
-	void RecoveryRecoil();
 
 	bool IsFullMagazine();
 

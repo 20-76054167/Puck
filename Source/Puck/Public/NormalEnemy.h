@@ -49,13 +49,17 @@ public:
 
 	float TakeDamage(float takenDamage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
-private:
+	UFUNCTION(BlueprintCallable)
 	void Die();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Execution")
+	bool bIsPendingForDeath = false;
+private:
+
 	UPROPERTY(EditAnywhere, Category = "Effects")
-	UParticleSystem* EparticleEffect; // ÆÄÆ¼Å¬ ÀÌÆåÆ® º¯¼ö
+	UParticleSystem* EparticleEffect; // ï¿½ï¿½Æ¼Å¬ ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½
 
 	UParticleSystemComponent* particleComponent;
 
-	UParticleSystem* EDeathEffect; // ÆÄÆ¼Å¬ ÀÌÆåÆ® º¯¼ö
+	UParticleSystem* EDeathEffect; // ï¿½ï¿½Æ¼Å¬ ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½
 };

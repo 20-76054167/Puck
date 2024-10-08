@@ -47,7 +47,10 @@ bool UPuckWeaponComponent::AttachWeapon(class APuckSlayer* TargetCharacter)
 
 	// Attach the weapon to the First Person Character
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-	AttachToComponent(Character->GetMesh(), AttachmentRules, AttachedSocketName);
+	if (!AttachToComponent(Character->GetMesh(), AttachmentRules, AttachedSocketName))
+	{
+		return false;
+	}
 	
 	// add the weapon as an instance component to the character
 	Character->AddInstanceComponent(this);
@@ -124,6 +127,13 @@ void UPuckWeaponComponent::Fire()
 	APuckSlayer* puckCharac = Cast<APuckSlayer>(Character);
 	if (puckCharac != nullptr && puckCharac->CurrentEwType == EWType::Shotgun)
 	{
+		// FVector SocketLocation;
+		// FRotator SocketRotation;
+		//
+		// GetSocketWorldLocationAndRotation("Muzzle", SocketLocation, SocketRotation);
+		//
+		// UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleParticle, SocketLocation, SocketRotation);
+		
 		puckCharac->PlayFireAnim();
 	}
 	
@@ -139,6 +149,13 @@ void UPuckWeaponComponent::FireTrace()
 	APuckSlayer* puckCharac = Cast<APuckSlayer>(Character);
 	if (puckCharac != nullptr && puckCharac->CurrentEwType == EWType::Rifle)
 	{
+		// FVector SocketLocation;
+		// FRotator SocketRotation;
+		//
+		// GetSocketWorldLocationAndRotation("Muzzle", SocketLocation, SocketRotation);
+		//
+		// UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleParticle, SocketLocation, SocketRotation);
+		
 		puckCharac->PlayFireAnim();
 	}
 }

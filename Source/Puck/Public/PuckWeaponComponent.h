@@ -27,6 +27,11 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim Montage")
 	UAnimMontage* FireAnimation;
+
+
+	// Muzzle
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Muzzle")
+	UParticleSystem* MuzzleParticle;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Gameplay")
 	FVector MuzzleOffset;
