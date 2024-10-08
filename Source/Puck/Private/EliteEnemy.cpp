@@ -80,6 +80,11 @@ float AEliteEnemy::TakeDamage(float takenDamage, FDamageEvent const& DamageEvent
 	{
 		FTimerHandle deathTimer;
 		GetWorld()->GetTimerManager().SetTimer(deathTimer, this, &AEliteEnemy::Die, 2.0f, false);
+		UPrimitiveComponent* CollisionComponent = Cast<UPrimitiveComponent>(GetRootComponent());
+		if (CollisionComponent)
+		{
+			CollisionComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		}
 	}
 	return Super::TakeDamage(takenDamage, DamageEvent, EventInstigator, DamageCauser);
 
@@ -91,6 +96,10 @@ void AEliteEnemy::Die()
 	if (EDeathEffect)
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), EDeathEffect, GetActorLocation(), FRotator::ZeroRotator, newDieScale, true);
+	}
+	if(PoofSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), PoofSound, GetActorLocation());
 	}
 	Destroy();
 }

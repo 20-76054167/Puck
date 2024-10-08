@@ -5,6 +5,8 @@
 
 #include <string>
 
+#include "CS_RifleRecoil.h"
+#include "CS_ShotgunRecoil.h"
 #include "Camera/CameraComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -23,35 +25,12 @@ UFireActorComponent::UFireActorComponent()
 	{
 		ownerPlayer = Cast<APuckSlayer>(GetOwner());
 	}
-
-	ConstructorHelpers::FObjectFinder<UCurveFloat> curve(TEXT("/Script/Engine.CurveFloat'/Game/FireRecoilCurve.FireRecoilCurve'"));
-
-	if(curve.Succeeded())
-	{
-		recoilCurve = curve.Object;
-	}
-
-	recoilTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("Timeline Component"));
-	recoilStartCallback.BindUFunction(this, FName("RecoilStart"));
-	recoilEndCallback.BindUFunction(this, FName("RecoveryRecoil"));
-
-
+	
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("/Script/Engine.ParticleSystem'/Game/ParagonMurdock/FX/Particles/Abilities/Primary/FX/P_PlasmaShot_Hit_World.P_PlasmaShot_Hit_World'")); // ���� ��ƼŬ ��η� ����
 
 	if (ParticleAsset.Succeeded())
 	{
 		particleEffect = ParticleAsset.Object; // ��ƼŬ ����Ʈ�� ������ �Ҵ�
-	}
-}
-
-
-void UFireActorComponent::SetRecoilTimeline()
-{
-	if(recoilCurve)
-	{
-		recoilTimeline->AddInterpFloat(recoilCurve, recoilStartCallback);
-		recoilTimeline->SetTimelineFinishedFunc(recoilEndCallback);
-		recoilTimeline->SetLooping(false);
 	}
 }
 
@@ -61,7 +40,6 @@ void UFireActorComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ..
-	SetRecoilTimeline();
 	
 	AController* ownerController = ownerPlayer->GetController();
 	if(ownerController)
@@ -151,8 +129,8 @@ void UFireActorComponent::FireByTrace()
 				}
 			}
 		}
-	
-		recoilTimeline->PlayFromStart();
+
+		GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(UCS_ShotgunRecoil::StaticClass());
 	}
 	else if(currentMode == EWType::Rifle)
 	{
@@ -161,23 +139,24 @@ void UFireActorComponent::FireByTrace()
 		FCollisionQueryParams _collisionParam;
 		_collisionParam.AddIgnoredActor(ownerPlayer);
 
-		float yawRandom = FMath::RandRange(-0.8, 0.8);
-		float pitchRandom = FMath::RandRange(-0.5, 0.0);
+		float yawRandom = FMath::RandRange(-0.3, 0.3);
+		float pitchRandom = FMath::RandRange(-0.2, 0.1);
 
 		if(bIsAiming)
 		{
 			_endLoc.X += pitchRandom;
 			_endLoc.Z += yawRandom;
 		}
-		
-		bool isHit = GetWorld()->LineTraceSingleByChannel(_hitRes, _startLoc, _endLoc, ECC_Pawn, _collisionParam);
-		DrawDebugLine(GetWorld(), _startLoc, _endLoc, FColor::Green, true, 5.f);
-
-		if(IsValid(playerController))
+		else
 		{
 			playerController->AddYawInput(yawRandom);
 			playerController->AddPitchInput(pitchRandom);
 		}
+		
+		GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(UCS_RifleRecoil::StaticClass());
+		
+		bool isHit = GetWorld()->LineTraceSingleByChannel(_hitRes, _startLoc, _endLoc, ECC_Pawn, _collisionParam);
+		DrawDebugLine(GetWorld(), _startLoc, _endLoc, FColor::Green, true, 5.f);
 		
 		if(isHit)
 		{
@@ -260,22 +239,6 @@ int32 UFireActorComponent::GetCurrentMagazine()
 	else
 	{
 		return 1;
-	}
-}
-
-void UFireActorComponent::RecoilStart(float value)
-{
-	if(IsValid(playerController))
-	{
-		playerController->AddPitchInput(value);
-	}
-}
-
-void UFireActorComponent::RecoveryRecoil()
-{
-	if(IsValid(playerController))
-	{
-		playerController->AddPitchInput(3);
 	}
 }
 

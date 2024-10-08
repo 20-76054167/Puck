@@ -54,6 +54,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Execution")
 	bool bIsPendingForDeath = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SoundEffects")
+	class USoundBase* PoofSound;
 private:
 
 	UPROPERTY(EditAnywhere, Category = "Effects")

@@ -39,8 +39,10 @@ public:
 
 	float TakeDamage(float takenDamage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SoundEffects")
+	class USoundBase* PoofSound;
 private:
-
 	void Die();
-	UParticleSystem* EDeathEffect; // ÆÄÆ¼Å¬ ÀÌÆåÆ® º¯¼ö
+	UParticleSystem* EDeathEffect; // ï¿½ï¿½Æ¼Å¬ ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½
+
 };
