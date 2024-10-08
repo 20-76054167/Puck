@@ -131,6 +131,12 @@ float ANormalEnemy::TakeDamage(float takenDamage, FDamageEvent const& DamageEven
 	{
 		FTimerHandle deathTimer;
 		GetWorld()->GetTimerManager().SetTimer(deathTimer, this, &ANormalEnemy::Die, 2.0f, false);
+		UPrimitiveComponent* CollisionComponent = Cast<UPrimitiveComponent>(GetRootComponent());
+		if (CollisionComponent)
+		{
+			CollisionComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		}
+
 	}
 	return Super::TakeDamage(takenDamage, DamageEvent, EventInstigator, DamageCauser);
 }
