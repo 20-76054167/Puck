@@ -28,7 +28,7 @@ public:
 	float damage = 10;
 
 	UPROPERTY(EditAnywhere, Category="bullet option")
-	float range = 2500;
+	float range = 3500;
 
 	UPROPERTY(EditAnywhere, Category="bullet option")
 	float pitchCongestion = 200;
