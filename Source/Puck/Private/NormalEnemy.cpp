@@ -148,6 +148,10 @@ void ANormalEnemy::Die()
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), EDeathEffect, GetActorLocation(), FRotator::ZeroRotator, newDieScale, true);
 	}
+	if(PoofSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), PoofSound, GetActorLocation());
+	}
 	Destroy();
 }
 
