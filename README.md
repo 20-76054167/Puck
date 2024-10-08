@@ -5,7 +5,7 @@
   2. [ParagonMurdock](https://www.unrealengine.com/marketplace/en-US/product/paragon-murdock)
   3. [ParagonSevarog](https://www.unrealengine.com/marketplace/en-US/product/paragon-sevarog)
   4. [ParagonTwinblast](https://www.unrealengine.com/marketplace/en-US/product/paragon-twinblast)
-  5. [paragonRampage](https://www.unrealengine.com/marketplace/en-US/product/paragon-rampage)
+  5. [ParagonRampage](https://www.unrealengine.com/marketplace/en-US/product/paragon-rampage)
 
 - Weapon Assets
   1. [MilitaryWeapDark](https://www.unrealengine.com/marketplace/en-US/product/military-weapons-dark)
