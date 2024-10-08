@@ -28,7 +28,7 @@ public:
 	float damage = 10;
 
 	UPROPERTY(EditAnywhere, Category="bullet option")
-	float range = 1000;
+	float range = 2500;
 
 	UPROPERTY(EditAnywhere, Category="bullet option")
 	float pitchCongestion = 200;
@@ -43,16 +43,16 @@ public:
 	int32 bulletNum = 6;
 	
 	UPROPERTY(EditAnywhere, Category="bullet option")
-	int32 maxMagazineShotGun = 5;
+	int32 maxMagazineShotGun = 10;
 
 	UPROPERTY(EditAnywhere, Category="bullet option")
-	int32 magazineShotGun = 2;
+	int32 magazineShotGun = 10;
 
 	UPROPERTY(EditAnywhere, Category="bullet option")
-	int32 maxMagazineRifle = 10;
+	int32 maxMagazineRifle = 100;
 
 	UPROPERTY(EditAnywhere, Category="bullet option")
-	int32 magazineRifle = 6;
+	int32 magazineRifle = 100;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bCanAttack = true;
