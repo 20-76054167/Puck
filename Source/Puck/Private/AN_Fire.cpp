@@ -22,8 +22,12 @@ void UAN_Fire::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Anima
 			PuckSlayer->fireActorComp->bCanAttack = false;
 			currnetMagazine--;
 			PuckSlayer->fireActorComp->SetMagazine(currnetMagazine);
+
+			// set HUD Magazine Value
+			if(PuckSlayer->HUD)
+			{
+				PuckSlayer->HUD->SetMagazine();
+			}
 		}
-		// set HUD Magazine Value
-		PuckSlayer->HUD->SetMagazine();
 	}
 }
