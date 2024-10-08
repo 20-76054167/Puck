@@ -103,7 +103,7 @@ void ANormalEnemy::AttackPlayer()
 	
 	bool isHit = GetWorld()->SweepSingleByChannel(_HitOut, _Start, _End, FQuat::Identity, ECC_GameTraceChannel1, FCollisionShape::MakeSphere(200.f), _TraceParams);
 	//DrawDebugLine(GetWorld(), _Start, _End, FColor::Red, false, 10.0f);
-	DrawDebugSphere(GetWorld(), _HitOut.ImpactPoint, 10.0f, 12, FColor::Yellow, false, 2.f);
+	//DrawDebugSphere(GetWorld(), _HitOut.ImpactPoint, 10.0f, 12, FColor::Yellow, false, 2.f);
 	FVector hitLocation = _HitOut.ImpactPoint;
 	
 	auto* PlayerActor = Cast<APuckSlayer>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
@@ -113,10 +113,10 @@ void ANormalEnemy::AttackPlayer()
 		{
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), EparticleEffect, hitLocation, FRotator::ZeroRotator, true);
 		}
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("HitActor: %s"), *_HitOut.GetActor()->GetName()));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("HitActor: %s"), *_HitOut.GetActor()->GetName()));
 		// UGameplayStatics::ApplyDamage(PlayerActor, DamageAmount, GetController(), this, UDamageType::StaticClass());
 		PlayerActor->PlayerStatusComponent->TakeDamage(DamageAmount, _Start);
-		UE_LOG(LogTemp, Warning, TEXT("TakeDamage : %f"), PlayerActor->PlayerStatusComponent->CurrentHealth);
+		//UE_LOG(LogTemp, Warning, TEXT("TakeDamage : %f"), PlayerActor->PlayerStatusComponent->CurrentHealth);
 	}
 
 
