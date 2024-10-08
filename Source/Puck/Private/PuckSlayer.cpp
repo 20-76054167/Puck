@@ -19,6 +19,7 @@
 #include "Puck/Widgets/HUDUserWidget.h"
 #include "Sound/SoundBase.h"
 #include "Kismet/GameplayStatics.h"
+#include "Puck/Widgets/HitIndicator.h"
 
 // Sets default values
 APuckSlayer::APuckSlayer()
@@ -135,6 +136,12 @@ void APuckSlayer::BeginPlay()
 	TargetCameraRelativeLocation = DefaultCameraRelativeLocation;
 
 	HUD->SetMagazine();
+
+	// Status Component 에 delegate 연결
+	if (PlayerStatusComponent)
+	{
+		PlayerStatusComponent->OnDamageTakenWithLocation.AddDynamic(this, &APuckSlayer::HandleDamageTakenWithLocation);
+	}
 }
 
 // Called every frame
@@ -444,7 +451,7 @@ void APuckSlayer::PlayFireAnim()
 						UGameplayStatics::PlaySoundAtLocation(GetWorld(), FireSound_Shotgun, GetActorLocation());
 					}
 
-					Shotgun->GetSocketWorldLocationAndRotation("Muzzle", SocketLocation, SocketRotation);
+					Shotgun->GetSocketWorldLocationAndRotation("MuzzleFlash", SocketLocation, SocketRotation);
 					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Shotgun->MuzzleParticle, SocketLocation, SocketRotation);
 				}
 				else if(CurrentEwType == EWType::Rifle)
@@ -474,7 +481,7 @@ void APuckSlayer::PlayFireAnim()
 						UGameplayStatics::PlaySoundAtLocation(GetWorld(), FireSound_Rifle, GetActorLocation());
 					}
 
-					Rifle->GetSocketWorldLocationAndRotation("Muzzle", SocketLocation, SocketRotation);
+					Rifle->GetSocketWorldLocationAndRotation("MuzzleFlash", SocketLocation, SocketRotation);
 					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Rifle->MuzzleParticle, SocketLocation, SocketRotation);
 				}
 				
@@ -540,6 +547,53 @@ void APuckSlayer::ResetDashCooldown()
 {
 	bIsDashOnCooldown = false;
 	DashRemainingTime = 0.0f;
+}
+
+void APuckSlayer::HandleDamageTakenWithLocation(FVector EnemyLocation)
+{
+	if (HitIndicator == nullptr)
+	{
+		HitIndicator = Cast<UHitIndicator>(CreateWidget(GetWorld(), HitIndicatorFactory));
+		HitIndicator->AddToViewport();
+	}
+
+	FVector PlayerLocation = GetActorLocation();
+	FVector Direction = (EnemyLocation - PlayerLocation).GetSafeNormal();
+	FRotator LookAtRotator = FRotationMatrix::MakeFromX(Direction).Rotator();
+	float Angle = LookAtRotator.Yaw - GetActorRotation().Yaw;
+
+	if (Angle > 180.0f)
+	{
+		Angle -= 360.0f;
+	}
+	else if (Angle < -180.0f)
+	{
+		Angle += 360.0f;
+	}
+
+	float MappedValue;
+	if (Angle < 0.0f)
+	{
+		MappedValue = FMath::GetMappedRangeValueClamped(FVector2d(0.0f, -180.0f), FVector2d(0.0f, 0.5f), Angle);
+	}
+	else
+	{
+		MappedValue = FMath::GetMappedRangeValueClamped(FVector2d(0.0f, 180.0f), FVector2d(1.0f, 0.5f), Angle);
+	}
+	
+	UE_LOG(LogTemp, Display, TEXT("Angle: %f"), MappedValue);
+	HitIndicator->MatInstance->SetScalarParameterValue(FName("Angle"), MappedValue);
+
+	HitIndicator->SetVisibility(ESlateVisibility::Visible);
+
+	GetWorld()->GetTimerManager().ClearTimer(HitIndicatorTimerHandle);
+	GetWorld()->GetTimerManager().SetTimer(HitIndicatorTimerHandle, FTimerDelegate::CreateLambda([this]()
+	{
+		if (HitIndicator)
+		{
+			HitIndicator->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}), 2.0f, false);
 }
 
 

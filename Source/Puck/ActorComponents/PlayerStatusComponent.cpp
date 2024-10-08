@@ -42,10 +42,11 @@ void UPlayerStatusComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	// ...
 }
 
-void UPlayerStatusComponent::TakeDamage(const float Amount)
+void UPlayerStatusComponent::TakeDamage(const float Amount, const FVector EnemyLocation)
 {
 	CurrentHealth -= Amount;
 	OnDamageTaken.Broadcast();
+	OnDamageTakenWithLocation.Broadcast(EnemyLocation);
 	if (CurrentHealth <= 0.0f)
 	{
 		OnDeath.Broadcast();

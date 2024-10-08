@@ -7,6 +7,7 @@
 #include "PlayerStatusComponent.generated.h"
 
 enum class EWType : uint8;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDamageTakenWithLocationSignature, FVector, EnemyLocation);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDamageTakenSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeathSignature);
 UCLASS(ClassGroup=(Custom),Blueprintable ,meta=(BlueprintSpawnableComponent))
@@ -37,7 +38,7 @@ public:
 	float MaxHealth;
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
-	void TakeDamage(float Amount);
+	void TakeDamage(float Amount, FVector EnemyLocation);
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
 	void RecoveryHealth(float Amount);
@@ -47,4 +48,7 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category="Events")
 	FOnDeathSignature OnDeath;
+
+	UPROPERTY(BlueprintAssignable, Category="Events")
+	FOnDamageTakenWithLocationSignature OnDamageTakenWithLocation;
 };

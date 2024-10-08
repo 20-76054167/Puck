@@ -65,7 +65,7 @@ void AEliteEnemy::AttackPlayer()
 	{
 
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("HitActor: %s"), *_HitOut.GetActor()->GetName()));
-		PlayerActor->PlayerStatusComponent->TakeDamage(EliteDamageAmount);
+		PlayerActor->PlayerStatusComponent->TakeDamage(EliteDamageAmount, _Start);
 		UE_LOG(LogTemp, Warning, TEXT("TakeDamage : %f"), PlayerActor->PlayerStatusComponent->CurrentHealth);
 	}
 }
